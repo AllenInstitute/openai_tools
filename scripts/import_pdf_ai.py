@@ -4,14 +4,30 @@ from pdfminer.layout import LAParams
 import nltk
 nltk.download('punkt')
 from nltk.tokenize import word_tokenize
+import os
+from dotenv import load_dotenv
 
-# Replace with your own OpenAI API key
-openai.api_key = "YOUR_API_KEY"
+# Load the environment variables from the .env file
+load_dotenv()
+
+# Replace with your own OpenAI API key or set the OPENAI_API_KEY environment variable
+openai.api_key =  os.getenv('OPENAI_API_KEY')
+
+# We get the path to this script
+script_path = os.path.dirname(os.path.realpath(__file__))
 
 # Replace with the path to your PDF
-pdf_path = r'PATH_TO_PDF'
+pdf_path = os.path.join(script_path, '../example/2020.12.15.422967v4.full.pdf')
 
 def count_tokens(text):
+    """Counts the number of tokens in a string.
+    Args:
+        text (str): The text to count the tokens of.
+    Returns:
+        int: The number of tokens.
+    """
+
+    # This is not a perfect way to count tokens for ChatGPT, but it's good enough for our purposes.
     tokens = word_tokenize(text)
     return len(tokens)
 
@@ -98,8 +114,8 @@ def summarize_text_into_chunks(text):
 nb_chunks = 10
 current_text = text
 while (nb_chunks > 1):
-    print(nb_chunks)
     current_text, nb_chunks = summarize_text_into_chunks(current_text)
+    print(f"Current number of chunks :{nb_chunks}")
 
 # We print the final summary
 print(current_text)
