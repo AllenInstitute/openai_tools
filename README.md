@@ -6,7 +6,7 @@ Running
 ========================
 
 1. At the moment, there is a simple script. To run it, you first need to create your conda environment as :
-'''conda create --name <your_env_name> --file requirements.txt'''
+```conda create --name <your_env_name> --file requirements.txt```
 
 2. Then activate it: 
 '''conda activate <your_env_name>'''
