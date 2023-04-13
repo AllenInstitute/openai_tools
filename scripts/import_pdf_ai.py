@@ -63,9 +63,6 @@ def convert_to_detokenized_text(tokenized_text):
 laparams = LAParams()
 text = extract_text(pdf_path, laparams=laparams)
 
-# We cut the abstract
-text = text[1595:]
-
 def summarize_text_into_chunks(text):
     """Summarizes a text into chunks.
     Args:
