@@ -1,6 +1,6 @@
 [![License](https://img.shields.io/badge/license-MIT-brightgreen)](LICENSE)
 
-This repository stores simple scripts to explore scientific publication pdfs using ChatGPT API. This is created with the simple intention of sharing useful code to look at publication records across the litterature.
+This repository stores simple scripts to explore scientific publication pdfs using ChatGPT API. This is created with the simple intention of sharing useful code to look across the litterature.
 
 Running
 ========================
