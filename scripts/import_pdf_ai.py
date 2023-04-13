@@ -109,9 +109,15 @@ if __name__ == "__main__":
                         help='Path to a pdf file', 
                         type=str, 
                         default=os.path.join(script_path, '../example/2020.12.15.422967v4.full.pdf'))
+    parser.add_argument('--save_summary', 
+                        help='Save the summary in a txt file along the pdf file', 
+                        type=bool, 
+                        default=False)
+   
     args = parser.parse_args()
 
     pdf_path = args.path_pdf
+    save_summary = args.save_summary
 
     # Extract text from the PDF
     laparams = LAParams()
@@ -124,5 +130,11 @@ if __name__ == "__main__":
         current_text, nb_chunks = summarize_text_into_chunks(current_text)
         print(f"Current number of chunksls:{nb_chunks}")
 
+    # We save the summary in a txt file
+    if save_summary:
+        summary_path = pdf_path.replace(".pdf", ".txt")
+        with open(summary_path, "w") as f:
+            f.write(current_text)
+            
     # We print the final summary
     print(current_text)
