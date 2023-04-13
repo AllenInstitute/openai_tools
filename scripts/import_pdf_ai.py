@@ -1,6 +1,4 @@
 import openai
-import requests
-from io import BytesIO
 from pdfminer.high_level import extract_text
 from pdfminer.layout import LAParams
 import nltk
