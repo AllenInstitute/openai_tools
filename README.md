@@ -2,6 +2,28 @@
 
 This repository stores simple scripts and code to access ChatGPT API. This is created with the simple intention of sharing useful code to look at publication records across the litterature.
 
+Running
+========================
+
+1. At the moment, there is a simple script. To run it, you first need to create your conda environment as :
+'''conda create --name <your_env_name> --file requirements.txt'''
+
+2. Then activate it: 
+'''conda activate <your_env_name>'''
+
+4. Go the script folder:
+'''cd scripts'''
+
+5. Copy your openAi API key in the .env file. You can find this here: https://platform.openai.com/account/api-keys
+
+6. Run it using:
+'''python import_pdf_ai.py --path_pdf <path_to_your_pdf> --save_summary True'''
+
+This will save a little text file along with your pdf with the same filename but with a .txt extension. 
+
+Example
+========================
+See the example/ folder for example runs. 
 
 Credits
 ========================
