@@ -6,18 +6,13 @@ nltk.download('punkt')
 from nltk.tokenize import word_tokenize
 import os
 from dotenv import load_dotenv
+import argparse
 
 # Load the environment variables from the .env file
 load_dotenv()
 
 # Replace with your own OpenAI API key or set the OPENAI_API_KEY environment variable
 openai.api_key =  os.getenv('OPENAI_API_KEY')
-
-# We get the path to this script
-script_path = os.path.dirname(os.path.realpath(__file__))
-
-# Replace with the path to your PDF
-pdf_path = os.path.join(script_path, '../example/2020.12.15.422967v4.full.pdf')
 
 def count_tokens(text):
     """Counts the number of tokens in a string.
@@ -73,10 +68,6 @@ def convert_to_detokenized_text(tokenized_text):
     prompt_text = prompt_text.replace(" 's", "'s")
     return prompt_text
 
-# Extract text from the PDF
-laparams = LAParams()
-text = extract_text(pdf_path, laparams=laparams)
-
 def summarize_text_into_chunks(text):
     """Summarizes a text into chunks.
     Args:
@@ -110,12 +101,28 @@ def summarize_text_into_chunks(text):
     nb_chunks = len(list_chunk)
     return concatenated_summaries, nb_chunks
 
-# We summarize the text into chunks
-nb_chunks = 10
-current_text = text
-while (nb_chunks > 1):
-    current_text, nb_chunks = summarize_text_into_chunks(current_text)
-    print(f"Current number of chunks :{nb_chunks}")
+if __name__ == "__main__":
+    script_path = os.path.dirname(os.path.realpath(__file__))
 
-# We print the final summary
-print(current_text)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--path_pdf', 
+                        help='Path to a pdf file', 
+                        type=str, 
+                        default=os.path.join(script_path, '../example/2020.12.15.422967v4.full.pdf'))
+    args = parser.parse_args()
+
+    pdf_path = args.path_pdf
+
+    # Extract text from the PDF
+    laparams = LAParams()
+    text = extract_text(pdf_path, laparams=laparams)
+
+    # We summarize the text into chunks
+    nb_chunks = 10
+    current_text = text
+    while (nb_chunks > 1):
+        current_text, nb_chunks = summarize_text_into_chunks(current_text)
+        print(f"Current number of chunksls:{nb_chunks}")
+
+    # We print the final summary
+    print(current_text)
