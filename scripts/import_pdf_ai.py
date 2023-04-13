@@ -80,7 +80,7 @@ def summarize_text_into_chunks(text):
     for i, chunk in enumerate(list_chunk):
         local_text = convert_to_detokenized_text(chunk)
 
-        prompt = "Can you write a spotlight for cell report of this article: " + local_text
+        prompt = "Write a summary for a technical expert: " + local_text
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": prompt}],
@@ -102,7 +102,7 @@ def summarize_text_into_chunks(text):
 # We summarize the text into chunks
 nb_chunks = 10
 current_text = text
-while (nb_chunks > 2):
+while (nb_chunks > 1):
     print(nb_chunks)
     current_text, nb_chunks = summarize_text_into_chunks(current_text)
 
