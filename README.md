@@ -60,6 +60,7 @@ Suggested values: 1 for an abstract, 2 or 3 for more detailed summaries
 Example
 ========================
 See the example/ folder for example runs. 
+There is a typical short example (length of a typical abstract) and a long summary (using chunk_length 4). 
 
 Credits
 ========================
