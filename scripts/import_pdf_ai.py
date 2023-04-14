@@ -43,7 +43,7 @@ def break_up_file(tokens, chunk_size, overlap_size):
         yield chunk
         yield from break_up_file(tokens[chunk_size-overlap_size:], chunk_size, overlap_size)
 
-def break_up_file_to_chunks(text, chunk_size=1000, overlap_size=100):
+def break_up_file_to_chunks(text, chunk_size=1000, overlap_size=0):
     """Breaks up a file into chunks of tokens.
     Args:
         text (str): The text to break up.
@@ -79,10 +79,15 @@ def summarize_text_into_chunks(text):
 
     all_summaries = []
     list_chunk = break_up_file_to_chunks(text)
+
     for i, chunk in enumerate(list_chunk):
         local_text = convert_to_detokenized_text(chunk)
 
-        prompt = "Write a summary for a technical expert: " + local_text
+        # We take 100 characters from the previous paragraph
+        prompt = "Write a long summary for a technical expert\
+                of the following paragraph, from a paper, refering to the text as -This publication-:\n" \
+                + local_text
+
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": prompt}],
@@ -91,13 +96,9 @@ def summarize_text_into_chunks(text):
             stop=None,
             temperature=0.7,
         )
-
-        # Print the summary
         all_summaries.append(response.choices[0].message.content)
-        # print(response.choices[0].text.strip())
 
-    concatenated_summaries = " ".join(all_summaries)
-
+    concatenated_summaries = "\n".join(all_summaries)
     nb_chunks = len(list_chunk)
     return concatenated_summaries, nb_chunks
 
@@ -113,28 +114,51 @@ if __name__ == "__main__":
                         help='Save the summary in a txt file along the pdf file', 
                         type=bool, 
                         default=False)
+    
+    parser.add_argument('--cut_bibliography',
+                        help='Try not to summarize the bibliography at the end of the pdf file',
+                        type=bool,
+                        default=True)
    
+    parser.add_argument('--chunk_length',
+                        help='This is to increase the final length of the summary. The document is summarized in chunks. More \
+                        chunks means a longer summary. Inconsitencty across the sections could occur with larger number. Typically \
+                        1 is a good value for an abstract and 2, 3 for more details.',
+                        type=int,
+                        default=1)
+    
     args = parser.parse_args()
 
     pdf_path = args.path_pdf
     save_summary = args.save_summary
+    chunk_length = args.chunk_length
 
     # Extract text from the PDF
     laparams = LAParams()
     text = extract_text(pdf_path, laparams=laparams)
 
+    # We remove the bibliography
+    # This is a very low tech way to do it, we will improve it later
+    if args.cut_bibliography:
+        if "References" in text:
+            text = text.split("References")[0]
+        if "Bibliography" in text:
+            text = text.split("Bibliography")[0]
+
     # We summarize the text into chunks
     nb_chunks = 10
+
     current_text = text
-    while (nb_chunks > 1):
+    while (nb_chunks > chunk_length):        
+
         current_text, nb_chunks = summarize_text_into_chunks(current_text)
-        print(f"Current number of chunksls:{nb_chunks}")
+        print(f"Current number of chunks:{nb_chunks}")
 
     # We save the summary in a txt file
     if save_summary:
         summary_path = pdf_path.replace(".pdf", ".txt")
         with open(summary_path, "w") as f:
             f.write(current_text)
-            
+
     # We print the final summary
     print(current_text)
