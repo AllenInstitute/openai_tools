@@ -43,7 +43,7 @@ def break_up_file(tokens, chunk_size, overlap_size):
         yield chunk
         yield from break_up_file(tokens[chunk_size-overlap_size:], chunk_size, overlap_size)
 
-def break_up_file_to_chunks(text, chunk_size=1000, overlap_size=0):
+def break_up_file_to_chunks(text, chunk_size=2000, overlap_size=0):
     """Breaks up a file into chunks of tokens.
     Args:
         text (str): The text to break up.
@@ -68,6 +68,26 @@ def convert_to_detokenized_text(tokenized_text):
     prompt_text = prompt_text.replace(" 's", "'s")
     return prompt_text
 
+def call_chatGPT(prompt, max_tokens = 1000, temperature=0.2):
+    """Calls the OpenAI API to generate text.
+    Args:
+        prompt (str): The prompt to use for the API call.
+        max_tokens (int): The maximum number of tokens to generate.
+        temperature (float): The temperature to use for the API call.
+    Returns:
+        str: The generated text.
+    """
+
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=max_tokens,
+        n=1,
+        stop=None,
+        temperature=temperature,
+    )
+    return response.choices[0].message.content
+
 def summarize_text_into_chunks(text):
     """Summarizes a text into chunks.
     Args:
@@ -83,20 +103,15 @@ def summarize_text_into_chunks(text):
     for i, chunk in enumerate(list_chunk):
         local_text = convert_to_detokenized_text(chunk)
 
+
         # We take 100 characters from the previous paragraph
         prompt = "Write a long summary for a technical expert\
                 of the following paragraph, from a paper, refering to the text as -This publication-:\n" \
                 + local_text
 
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=1000,
-            n=1,
-            stop=None,
-            temperature=0.7,
-        )
-        all_summaries.append(response.choices[0].message.content)
+        result = call_chatGPT(prompt)
+
+        all_summaries.append(result)
 
     concatenated_summaries = "\n".join(all_summaries)
     nb_chunks = len(list_chunk)
@@ -150,9 +165,20 @@ if __name__ == "__main__":
 
     current_text = text
     while (nb_chunks > chunk_length):        
-
         current_text, nb_chunks = summarize_text_into_chunks(current_text)
         print(f"Current number of chunks:{nb_chunks}")
+    
+    # We can afford to clean up if the text is not too long
+    if nb_chunks > 1 & count_tokens(current_text) < 2000:
+        print(current_text)
+        print("Cleaning up the summary")
+        # We count the number of tokens
+        # If it small enough, we send the text for a last clean up. 
+        prompt = "Can you clean up this publication summary to remove redundant information? Make \
+            sure to keep the final text with the same amount of details:\n" \
+                + current_text
+
+        current_text = call_chatGPT(prompt, max_tokens = 2000)
 
     # We save the summary in a txt file
     if save_summary:
