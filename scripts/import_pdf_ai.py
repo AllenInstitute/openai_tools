@@ -169,8 +169,7 @@ if __name__ == "__main__":
         print(f"Current number of chunks:{nb_chunks}")
     
     # We can afford to clean up if the text is not too long
-    if nb_chunks > 1 & count_tokens(current_text) < 2000:
-        print(current_text)
+    if ((nb_chunks > 1) & (count_tokens(current_text) < 2000)):
         print("Cleaning up the summary")
         # We count the number of tokens
         # If it small enough, we send the text for a last clean up. 
