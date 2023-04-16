@@ -29,33 +29,41 @@ This will save a little text file along with your pdf with the same filename but
 Parameters
 ========================
 
-This script uses argparse to parse command-line arguments. Below is a summary of the available parameters:
-
 --path_pdf: Path to a PDF file that you want to summarize.
 
 Type: string
 
-Default: ../example/2020.12.15.422967v4.full.pdf
+Default: os.path.join(script_path, '../example/2020.12.15.422967v4.full.pdf')
 
 --save_summary: Save the generated summary in a txt file alongside the PDF file.
 
 Type: boolean
 
+Default: True
+
+--save_raw_text: Save the raw text in a txt file along the pdf file.
+
+Type: boolean
+
 Default: False
 
---cut_bibliography: Exclude the bibliography at the end of the PDF file from the summary.
+--save_compressed_text: Save the compressed text in a txt file along the pdf file.
+
+Type: boolean
+
+Default: False
+
+--cut_bibliography: Try not to summarize the bibliography at the end of the PDF file.
 
 Type: boolean
 
 Default: True
 
---chunk_length: Determines the final length of the summary by summarizing the document in chunks. More chunks result in a longer summary but may lead to inconsistency across sections.
+--chunk_length: Determines the final length of the summary by summarizing the document in chunks. More chunks result in a longer summary but may lead to inconsistency across sections. Typically, 1 is a good value for an abstract, and 2 or 3 for more detailed summaries.
 
 Type: integer
 
 Default: 1
-
-Suggested values: 1 for an abstract, 2 or 3 for more detailed summaries
 
 Example
 ========================
