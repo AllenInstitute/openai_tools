@@ -98,7 +98,7 @@ def convert_to_detokenized_text(tokenized_text):
 
     return prompt_text
 
-def call_chatGPT(prompt, max_tokens = 4000, temperature=0.2):
+def call_chatGPT(prompt, temperature=0.1):
     """Calls the OpenAI API to generate text.
     Args:
         prompt (str): The prompt to use for the API call.
@@ -179,7 +179,7 @@ def summarize_text_into_chunks(text):
 
         print(f"Summarizing chunk {i}/ {len(list_chunk)}")
         # We take 100 characters from the previous paragraph
-        prompt = "Write a long summary for a technical expert\
+        prompt = "Write a long, very detailed summary for a technical expert\
                 of the following paragraph, from a paper, refering to the text as -This publication-:\n" \
                 + local_text
 
@@ -284,8 +284,7 @@ if __name__ == "__main__":
         print("Cleaning up the summary")
         # We count the number of tokens
         # If it small enough, we send the text for a last clean up. 
-        prompt = "Can you clean up this publication summary to remove redundant information? Make \
-            sure to keep the final text with the same amount of details:\n" \
+        prompt = "Can you clean up this publication summary to make it flow logically. Keep this summary very technical and detailed:\n" \
                 + current_text
 
         current_text = call_chatGPT(prompt)
