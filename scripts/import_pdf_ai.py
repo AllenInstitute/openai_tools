@@ -183,7 +183,7 @@ def summarize_text_into_chunks(text):
                 of the following paragraph, from a paper, refering to the text as -This publication-:\n" \
                 + local_text
 
-        result = call_chatGPT(prompt)
+        result = call_chatGPT(prompt, temperature=0.5)
 
         all_summaries.append(result)
 
@@ -222,15 +222,7 @@ if __name__ == "__main__":
                         1 is a good value for an abstract and 2, 3 for more details.',
                         type=int,
                         default=1)
-    
-    # Here we can add a flag to select the section to summarize
-    # these are the sections we can select from
-    # abstract, introduction, methods, results, discussion
-    parser.add_argument('--select_section',
-                        help='Select the section to summarize. The options are: all(default), introduction, methods, results, discussion',
-                        type=str,
-                        choices= ['all', 'introduction', 'methods', 'results', 'discussion'], 
-                        default='all')
+
     args = parser.parse_args()
 
     pdf_path = args.path_pdf
@@ -238,7 +230,6 @@ if __name__ == "__main__":
     save_raw_text = args.save_raw_text
     save_compressed_text = args.save_compressed_text
     chunk_length = args.chunk_length
-    select_section = args.select_section
 
     # Extract text from the PDF
     laparams = LAParams()
