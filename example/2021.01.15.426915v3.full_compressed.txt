@@ -1,0 +1,151 @@
+Learning from unexpected events in the neocortical microcircuit
+
+Colleen J. Gillon, Jason E. Pina, Jérôme A. Lecoq, Ruweida Ahmed, Yazan N. Billeh, Shiella Caldejon, Peter Groblewski, Timothy M. Henley, India Kato, Eric Lee, Jennifer Luviano, Kyla Mace, Chelsea Nayan, Thuyanh V. Nguyen, Kat North, Jed Perkins, Sam Seid, Matthew T. Valley, Ali Williford, Yoshua Bengio, Timothy P. Lillicrap, Blake A. Richards, and Joel Zylberberg
+
+Introduction
+
+A hypothesis in computational and systems neuroscience is that the neocortex learns a hierarchical predictive model of the world. This hypothesis postulates that learned top-down predictions are compared to bottom-up signals, and unexpected stimuli events induce differences between these signals and drive learning. In this study, the authors investigate the observable signatures of this type of hierarchical predictive learning.
+
+Methods
+
+The authors track the responses of individual somata and dendritic branches of layer 2/3 and layer 5 pyramidal neurons over multiple days in the primary visual cortex of awake, behaving mice using two-photon calcium imaging.
+
+Results
+
+The authors show that both somata and distal apical dendrites of cortical pyramidal neurons exhibit distinct unexpected event signals that systematically change over days. Many neurons in both layers 2/3 and 5 showed large differences between their response to expected and unexpected events. Interestingly, these responses evolved in opposite directions in the somata and distal apical dendrites.
+
+Conclusion
+
+The authors provide evidence for the observable signatures of hierarchical predictive learning in the neocortical microcircuit. These findings suggest that there are differences between the somata and distal apical dendrites that may be important for hierarchical computation, given that these two compartments tend to receive bottom-up and top-down information, respectively.However, there are still significant unknowns: e.g., do such responses evolved differently in different compartments of neurons? Second, there is some research suggesting that responses to unexpected stimuli change with exposure, supporting the second observable signature. Yet, this has only been shown over short time scales, such as a single experimental session. Third, there are a few studies showing that top-down projections carry distinct information to sensory areas, partially supporting the third observable signature. Nonetheless, it remains unknown whether changes in neural responses driven by top-down versus bottom-up signals show distinct changes over learning. Thus, the goal of this paper is to fill these gaps by concretely looking for all three of these signatures together in a systematic study.
+
+Here, we performed chronic two-photon calcium imaging of layer 2/3 and layer 5 pyramidal neurons at both the cell bodies and the distal apical dendrites in the primary visual cortex of awake, behaving mice over multiple days. These imaging planes were chosen since top-down signals largely impinge on the distal apical dendrites within cortical layer 1, while bottom-up signals largely impinge on the perisomatic compartments in deeper layers. During the recordings, the animals were exposed to randomly oriented visual stimuli with both expected and unexpected statistical properties. Altogether, this approach allowed us to track the responses of both individual cell bodies and individual distal apical dendritic branches over multiple days, during which the animals were provided with more exposure to unexpected events. The resulting data showed evidence corroborating all three of the signatures of hierarchical predictive learning above, supporting the hypothesis that the visual cortex learns from unexpected events using a hierarchical model. Moreover, we observed interesting differences between the distal apical dendrites and somata. Whereas somatic compartments showed a decrease in differential sensitivity to expected versus unexpected visual stimuli over days, distal apical dendrites showed an increase in differential sensitivity. This suggests that there may be important differences in the functional roles of the somatic and distal apical compartments in hierarchical predictive learning in the neocortex.We conducted calcium imaging of cortical neurons in mice to explore their responses to expected and unexpected sensory events. We used a sequential visual stimulus with a predictable global structure but stochastic local properties. The stimulus consisted of image frames composed of randomly placed Gabor patches, assembled into five-frame sequences (A-B-C-D-G). We randomly inserted "unexpected" events, i.e., stimulus events that violated the predictable global pattern. We tracked the mouse's movements on a running disc and its pupil diameter with an infrared camera during the imaging sessions. We extracted regions of interest (ROIs) in each imaging plane corresponding to individual distal apical dendrite segments or individual cell bodies, depending on the imaging plane. Each animal went through three imaging sessions, each performed on a different day, and we used a matching algorithm to identify the same ROIs across sessions. Thanks to a conservative quality control pipeline, signal-to-noise ratio (SNR), ∆F/F magnitudes, and number of ROIs were stable overall three sessions in both layer 2/3 and layer 5 cell bodies and dendrites. During the imaging sessions, the stimuli were broken up into approximately 30 blocks of randomly determined durations, each composed of repeated A-B-C-D-G sequences, as before. However, instead of comprising only expected sequences, each block ended with "unexpected" A-B-C-U-G sequences. In these sequences, the fourth frame, D, was replaced with an unexpected U frame, which had different Gabor locations and orientations. Specifically, the newly introduced U frames had unique random orientations.Therefore, we examined the evolution of the neuronal responses to expected and unexpected stimuli over the three different days of calcium imaging. This analysis made use of our ability to track the same ROIs over each of the three imaging sessions. First, we examined how population-wide responses to the stimuli changed over days. In the distal apical dendritic ROIs, the difference in responses to unexpected (A-B-C-U-G) and expected (A-B-C-D-G) sequences increased across days, reaching statistical significance in both L2/3 and L5 by session 3. In contrast, by session 3, the response differences in the somatic ROIs, which were statistically significant in session 1 for L5-S, converged towards zero. Indeed, specifically comparing the responses to the regular sequence frames (A-B-C) and the unexpected frames (U-G), we found that the average somatic ROI responses tended to decrease for both expected and unexpected frames over time, though the effect was only statistically significant in L2/3. In contrast, in the distal apical dendritic ROIs, we observed an increase in the average responses to the unexpected frames, but not to the regular sequence frames. These results indicate that the response to the unexpected stimuli evolved differently from the responses to the regular sequence frames in these different compartments. Importantly, there is evidence that representations in the brain can drift naturally over time, even in the absence of learning. As such, our above analyses left open the possibility that the changes we observed in the neural responses were not a result of unexpected event-driven learning, but were simply a result of non-specific representational drift. Nonetheless, to further test for non-specific drift, we also examined the evolution of the responses of the same ROIs to a different, visual flow stimulus, which, based on prior work, was unlikely to drive strong expectation violations due to the fact that the visual flow was not coupled to the animals' movements. In line with this previous work, we observed that although this stimulus drove changes in L2/3-S and L2/3-D, responses in L5-S and L5-D were fairly stable over sessions. Moreover, in all compartments, the changes in responses to unexpected stimuli and USIs were smaller for the visual flow stimulus than the Gabor stimuli. This indicates that our observations of relatively large changes in the response to the Gabor sequences were stimulus-specific, and hence unlikely to be caused by non-specific representational drift. Altogether, these data support the idea that VisP engages in unsupervised learning in response to unexpected events. Given our observations of changes in the response to the Gabor sequences at the population level, we wondered whether the same effects would be observable for the tracked ROIs. This is important because changes observed in the population-wide responses could, in principle, be driven by only a few ROIs. To test this possibility, we examined the changes over days in the responses of individual ROIs. First, we observed the same patterns as described above when we focused only on the tracked ROIs: i.e., the somatic responses tended to decrease for both regular sequence frames and unexpected frames, whereas the response to the unexpected frames increased in the distal apical dendrites.Figure 5 shows the results of the study, where unexpected Gabor sequences resulted in predictable changes in individual ROIs. The figure includes three panels, (A), (B), and (C), each showing different results. The text also mentions the use of chronic recordings in mouse VisP to search for observable signatures of learning from unexpected stimuli. The study found evidence supporting three observable signatures, including differences in neural responses to expected versus unexpected stimuli, changes in neural responses to unexpected stimuli over days, and differences in the evolution of responses between distal apical dendrites and cell bodies. The text also discusses the broad class of theories in neuroscience and machine learning that postulate hierarchical unsupervised learning, and how the study's results support this class of models. Finally, the text proposes a conceptual model for how the brain learns an internal representation of the world in associative regions.If incoming stimuli contain unexpected features, i.e., features not predicted at the distal apical dendrites (e.g., unexpected frames in Gabor sequences or an unexpected leaf on an apple), pyramidal cell somatic and distal apical dendritic activity will reflect the unexpected feature or event. However, with experience, this activity triggers changes to the internal model of the world, such that it better captures the new information provided by the unexpected stimuli (e.g., by accounting for the possibility of different Gabor frames, or of apples with leaves). As a result, the distal apical dendritic activity becomes more attuned to these novel forms of stimuli.
+
+Illustration of a conceptual model based on our data of how unexpected events drive changes in the neural circuit. With experience, unexpected event selectivity in the somata converges toward 0, whereas it increases overall in the distal apical dendrites, particularly in dendritic segments that initially showed low selectivity.
+
+Notably, our results do not support a simple version of predictive coding wherein excitatory neurons only encode prediction errors. Although the unexpected event responses in the somata did decrease over time, in line with encoding of errors, the responses in the dendrites increased. This suggests that different computations were reflected in the different compartments of the neurons. Moreover, the finding that the distal apical dendritic signals grow at a population level with exposure to the unexpected stimuli goes counter to proposals implementing predictive coding by using the distal apical dendrite as a site for prediction error calculations.
+
+There are a number of limitations to this work that must be recognized. First, we were not recording somata and distal apical dendrites in the same neurons. Thus, even though we saw very different evolutions in the responses of the distal apical dendrites and soma to the Gabor sequence stimulus, we cannot say with certainty that these differences hold within individual cells. Second, though we examined the distal apical dendrites separately from the soma specifically in order to identify potential differences in the processing of top-down and bottom-up inputs, an ideal experiment would record simultaneously from other higher-order brain regions and their projections into visual cortex. This would help determine whether the signals we saw in the distal apical dendrites were being calculated locally or in other regions. Third, given the nature of our visual stimuli we were unable to measure either the classical receptive fields or the orientation tuning of the neurons. Fourth, these experiments were open-loop, and thus did not incorporate any sensorimotor coupling to help shape expectations. Fifth, and relatedly, our experiments did not incorporate any behavioral training or rewards. Finally, it must be recognized that different sensory stimuli, which can present different forms of unexpected events, and recordings in different brain regions may produce different results. To more fully assess the hierarchical predictive learning hypothesis, future work should thoroughly explore the space of possible expected and unexpected sensory stimuli and other regions of the neocortex.
+
+A long-standing goal of neuroscience is to understand how our brains learn from the sensory data that we receive from the world around us.Answers to this question are critical to our understanding of how we build our internal models of the world, and how these govern how we interact with our surroundings. In this work, we monitored changes in the responses of visual cortical neurons in mice while they learned about new external stimuli, and found that these changes were consistent with a broad class of computational models, namely, hierarchical predictive models. Looking forward, we anticipate that these findings could drive substantial progress towards uncovering more specific models describing the brain's hierarchical predictive learning. To facilitate that progress, our data and analysis software are freely available to other researchers.They appeared on a gray screen background and were projected on a flat 24-inch monitor positioned 10cm from the right eye. The monitor was rotated and tilted to appear perpendicular to the optic axis of the eye, and the stimuli were warped spatially to mimic a spherical projection screen. Whereas habituation sessions increased in duration over days from 10 to 60 minutes, optical imaging sessions always lasted 70 minutes, comprising 34 minutes of Gabor sequence stimulus and 17 minutes of visual flow stimulus in each direction. Each stimulus period was flanked by one or 30 seconds of gray screen for the habituation and optical imaging sessions, respectively.
+
+The Gabor sequence stimulus was adapted from the stimulus used in [Homann et al., 2017]. Specifically, it consisted of repeating 1.5-second sequences, each comprising five consecutive frames (A-B-C-D-G) presented for 300ms each. Whereas G frames were uniformly gray, frames A, B, C, and D were defined by the locations and sizes of the 30 Gabor patches they each comprised. In other words, throughout a session, the locations and sizes of the Gabor patches were the same for all A frames, but differed between A and B frames. Furthermore, these locations and sizes were always resampled between mice, as well as between days, such that no two sessions comprised the same Gabor sequences, even for the same mouse. The location of each Gabor patch was sampled uniformly over the visual field, while its size was sampled uniformly from 10 to 20 visual degrees. Within each repeat of the sequence (A-B-C-D-G), the orientations of each of the Gabor patches were sampled randomly from a von Mises distribution with a shared mean and a kappa (dispersion parameter) of 16. This shared mean orientation was randomly selected for each sequence and counterbalanced for all four orientations {0◦, 45◦, 90◦, 135◦}. As such, although a larger range of Gabor patch orientations were viewed during a session, orientations were very similar within a single sequence. “Unexpected” sequences were created by replacing D frames with U frames in the sequence (A-B-C-U-G). U frames differed from D frames not only because they were defined by a distinct set of Gabor patch sizes and locations, but also because the orientations of their Gabor patches were sampled from a von Mises distribution with a mean shifted by 90◦ with respect to the preceding regular frames (A-B-C), namely from {90◦, 135◦, 180◦, 225◦}.
+
+The visual flow stimulus consisted of 105 white squares moving uniformly across the screen at a velocity of 50 visual degrees per second, with each square being 8 by 8 visual degrees in size. The stimulus was split into two consecutive periods ordered randomly, and each defined by the main direction in which the squares were moving (rightward or leftward, i.e., in the nasal-to-temporal direction or vice versa, respectively). Unexpected sequences, or flow violations, were created by reversing the direction of flow of a randomly selected 25% of the squares for 2–4 seconds at a time, following which they resumed their motion in the main direction of flow.
+
+Unexpected sequences, accounting for approximately 7% of the Gabor sequences and 5% of visual flow stimulus time, only occurred on optical imaging days, and not on habituation days. In particular, each 70-minute imaging session was broken up into approximately 30 blocks, each comprising 30–90 seconds of expected sequences followed by several seconds of unexpected sequences (3–6 seconds for Gabor sequence stimulus and 2–4 seconds for the visual flow stimulus). All durations were sampled randomly and uniformly for each block, across multiples of 1.5 seconds for the Gabor sequence stimulus and of 1 second for the visual flow stimulus.
+
+The stimuli were generated using Python 2.7 [Van Rossum and Drake, 1995] custom scripts based on PsychoPy 1.82.01 [Peirce, 2009] and CamStim 0.2.4, which was developed and shared by the Allen Institute for Brain Science. Code, instructions to reproduce the stimuli, and example videos are available on Github.
+
+In cases where the error could not be directly measured over the sample, e.g., the percentage of significant ROI USIs reported in Fig. 2F, a bootstrapped estimate of the error was obtained by resampling the data with replacement 104 times. In these cases, the standard deviation (SD) over the bootstrapped sample is plotted instead, and this is visually signaled by the use of broader error caps.
+
+Significance tests, unless otherwise indicated, were computed non-parametrically using permutation tests with 105 shuffles to construct null distributions, based on which confidence intervals (CIs) could be estimated. Where p-values are reported, they are two-tailed (except for Fig. 5C, S6F, and S7; see Sec. 4.6 Fluorescence trace analysis, below), and Bonferroni-corrected for multiple comparisons to reduce the risk of Type I errors (false positives). Where 95% CIs are plotted, they are equivalently adjusted using a Bonferroni correction. An exception was made for Fig. 3B, which reports the relationship between the stimuli and behavioral data.
+
+This version posted April 6, 2023. The copyright holder for this preprint (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made available under a CC-BY 4.0 International license.4.4 Running and pupil analysis
+
+Mice were allowed to run freely on a disc while head-fixed during habituation and optical imaging sessions. Running information was converted from disc rotations per running frame to cm/s. The resulting velocities were median-filtered with a five-frame kernel size, and any remaining outliers, defined as resulting from a single frame velocity change of at least ±50cm/s, were omitted from analyses.
+
+To track pupil diameter during imaging sessions, an infrared LED illuminated the eye ipsilateral to the monitor (right eye), allowing infrared videos to be recorded. We trained a DeepLabCut model from ∼200 manually labeled examples to automatically label points around the eye, from which we estimated the pupil diameter (∼0.01mm per pixel conversion). We omitted from analyses outlier frames, defined as resulting from a single-frame diameter change of at least 0.05mm, which usually resulted from blinking.
+
+Each data point in Fig. 3B corresponds to the difference in the mean running velocity or pupil diameter for one block between the unexpected and preceding expected Gabor sequences during session 1, with all blocks being pooled across mice. We computed p-values by comparing the mean difference overall blocks for each plane to a distribution of mean differences, obtained by shuffling the expected and unexpected labels 104 times and calculating the mean difference overall blocks for each shuffle.
+
+4.5 ROI tracking across sessions
+
+To track ROIs across days, we employed a custom-modified version of the ROI-matching package developed to track cell bodies across multiple recording days by the Allen Institute for Brain Science. This pipeline implements the enhanced correlation coefficient image registration algorithm to align ROI masks and the graph-theoretic blossom algorithm to optimize the separation and degree of overlap between pairwise matches, as well as the number of matches across all provided sessions. This process produced highly plausible matches for the somatic ROIs; however, it provided some implausible matches for the smaller and more irregularly shaped dendritic ROIs. For the dendritic ROIs, we therefore further constrained the putative matches to those that overlapped by at least 10–20%. Finally, we merged results across all session orderings (e.g., 1-2-3, 1-3-2, 3-1-2), eliminating any conflicting matches, i.e., non-identical matchings that shared ROIs.
+
+In total, the modified matching algorithm produced ∼100–500 highly plausible matched ROIs per plane, i.e., ∼32–75% of the theoretical maximum number of trackable ROIs (L2/3-D: n=254, L2/3-S: n=261, L5-D: n=516, L5-S: n=129).
+
+4.6 Fluorescence trace analysis
+
+For all results except those presented in Fig. 5A–B, S2C, and S4A, C, ROIs were pooled across all mice within an imaging plane for analyses. To enable ROI pooling across mice within imaging planes, each ROI's ∆F/F trace was scaled using robust standardization, i.e., by subtracting the median and then dividing by the interpercentile range spanning the 5th to 95th percentile. The only additional exceptions to this are Fig. 4C, S2A-B, S4B, S6A, where unscaled ∆F/F traces were used to ascertain how the ∆F/F signal itself changed across sessions.
+
+Unexpected event selectivity indices (USIs) were calculated for each ROI separately using Equation 1:
+
+USI = (µunexpected - µexpected) / (expected + σ^2) / (1/2σ^2),
+
+where the means (µexpected and µunexpected) and variances (σ^2_expected and σ^2_unexpected) were calculated across integrated ∆F/F responses to the expected and unexpected events, respectively. For the Gabor sequences, expected events responses were defined as those spanning D-G frames, and unexpected events were defined as those spanning U-G frames, with each event therefore spanning 600ms. Indeed, G frames were included in these expected and unexpected events, as they did not introduce any new stimuli, but did consistently show persisting ROI responses to D or U frames. For the visual flow stimulus, expected events were defined as the last 2 seconds of expected flow before unexpected flow onset (at which point 25% of the squares reversed direction), while unexpected events were defined as the first 2 seconds of unexpected flow. For each ROI, in addition to the true USI, a null distribution over USIs was obtained by randomly reassigning the expected and unexpected event labels to each response 104 times. USIs were deemed significantly low if they lay below the 2.5th percentile, and significantly high if they lay above the 97.5th percentile of their null distribution.
+
+Note that for Fig. 2G, USIs were calculated using only D-G and U-G stimuli for which the mean orientations were in {90◦, 135◦}, i.e., the orientations shared by D and U frames. For each imaging plane, the percentage of significant ROI USIs was then plotted with bootstrapped SDs. Adjusted 95% CIs over chance levels were estimated using the usual approximation method of the binomial CI, with the sample size corresponding to the number of ROIs in the plane.The mean ∆F/F values thus obtained for each ROI over a given session were then normalized by dividing by the mean ∆F/F for regular stimuli across all ROIs from the same mouse in session 1. These normalized means ± SEM over ROIs were then plotted for each session and plane. Absolute fractional differences between sessions in the responses to unexpected stimuli or in USIs were defined as µ3−µ1/µ1, where the subscripts indicate the session over which the mean µ is computed. For Fig. S6B, µ is the mean of the ∆F/F values overall ROIs for the given plane or pooled overall planes, as indicated, for unexpected sequences. As in Fig. 4C, the ∆F/F values were calculated relative to the mean expected ∆F/F values on session 1 for each mouse. For Fig. S6E, µ is the mean of the absolute values of the USIs for the given plane or pooled over all planes for unexpected sequences. Significance tests comparing session results (Fig. 4B–C, E–F, S4B, S5C, S6A, D) and those comparing Gabor sequence and visual flow stimulus results (Fig. S6B, E) were assessed by permuting the session or stimulus labels, respectively, to compute adjusted 95% CIs over results expected by chance.
+
+For the orientation decoding analyses, linear logistic regressions were trained with an L2 penalty on the multinomial task of classifying the mean Gabor patch orientation for D-G frames {0◦, 45◦, 90◦, 135◦} or U-G frames {90◦, 135◦, 180◦, 225◦}. Balanced classifier accuracy was evaluated on the test sets of 300 random cross-validation 75:25 train:test splits of the dataset for each mouse. Importantly, since the D-G frame datasets necessarily comprised many more examples than the U-G frame datasets (∼13x), they were first downsampled for each split to match the number of examples in the corresponding U-G frame datasets, thus enabling fairer comparisons between D-G and U-G classification results. Input data consisted of the ∆F/F responses for all ROIs together across D-G or U-G frames (600ms). The traces were standardized as described above, but using statistics drawn from the training data only. Mean balanced accuracy across dataset splits was calculated for each mouse, and the mean (± SEM) balanced accuracy across mice was plotted for each session and plane. To estimate chance accuracy, shuffled classifier performances were evaluated on 105 random cross-validation dataset splits for each mouse. These classifiers were trained as above, but for each split, the training set orientation targets were shuffled randomly. Null distributions over mean performance were obtained by averaging classifier accuracy for each split across mice, from which adjusted 95% CIs over accuracy levels expected by chance were calculated for each session and plane (Fig. 5A–B).
+
+Pearson correlation coefficients (Fig. 5C, S6F), and the corresponding regression slopes (Fig. S7) were calculated to compare ROI USIs in each imaging plane between sessions. Bootstrapped SDs over these correlations for each plane were then estimated, and adjusted 95% CIs were computed by permuting the ROI labels, such that tracked ROIs were no longer matched together. Here, one-tailed (lower tail) CIs were calculated to identify correlations that were more negative than expected by chance.The text from a scientific publication is as follows:
+
+634
+
+635
+
+636
+
+637
+
+638
+
+639
+
+640
+
+641
+
+642
+
+643
+
+644
+
+645
+
+646
+
+647
+
+648
+
+649
+
+650
+
+651
+
+652
+
+653
+
+654
+
+655
+
+656
+
+657
+
+658
+
+659
+
+660
+
+661
+
+662
+
+663
+
+664
+
+665
+
+666
+
+667
+
+668
+
+6https://github.com/colleenjg/OpenScope_CA_Analysis
+7https://github.com/AllenInstitute/AllenSDK
+8https://github.com/AllenInstitute/ophys_nway_matching/tree/main/nway
+9www.computeontario.caandwww.computecanada.ca
+
+17
+
+
+The text is a bioRxiv preprint with a DOI of https://doi.org/10.1101/2021.01.15.426915. This version was posted on April 6, 2023. The copyright holder for this preprint (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made available under a CC-BY4.0 International license.
