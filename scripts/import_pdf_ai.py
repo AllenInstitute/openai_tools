@@ -66,13 +66,20 @@ def break_up_file(tokens, chunk_size, overlap_size):
                 break    
         return current_length
 
-    if len(tokens) <= chunk_size:
-        yield tokens
-    else:
-        end_idx = find_sentence_boundary(tokens, chunk_size)
-        chunk = tokens[:end_idx]
-        yield chunk
-        yield from break_up_file(tokens[end_idx - overlap_size:], chunk_size, overlap_size)
+    chunks = []
+    start_idx = 0
+
+    while start_idx < len(tokens):
+        end_idx = start_idx + chunk_size
+        end_idx = min(end_idx, len(tokens))
+        end_idx = find_sentence_boundary(tokens, end_idx)
+
+        chunk = tokens[start_idx:end_idx]
+        chunks.append(chunk)
+
+        start_idx = end_idx - overlap_size
+
+    return chunks
 
 def break_up_file_to_chunks(text, chunk_size=2000, overlap_size=0):
     """Breaks up a file into chunks of tokens.
