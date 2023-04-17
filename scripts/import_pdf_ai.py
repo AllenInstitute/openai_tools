@@ -253,7 +253,7 @@ if __name__ == "__main__":
 
     # We first clean up the text
     print("Cleaning up and compressing the text")
-    prompt = "Remove formatting text, the abstract, author list, figure captions, references & bibliography, page number, headers and footers from the following text from a scientific publication. Don't change any other words:"
+    prompt = "Clean up formatting, Remove the abstract, Remove author list, Remove figure captions, Remove references & bibliography, Remove page number, Remove headers and Remove footers from the following text from a scientific publication. Don't change any other words:"
     text_compressed = process_long_text_through_openai_into_chunks(prompt, text, chunk_size=1500)
 
     # We save the raw text in a txt file
