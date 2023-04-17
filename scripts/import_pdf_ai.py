@@ -94,7 +94,17 @@ def convert_to_detokenized_text(tokenized_text):
         str: A detokenized string.
         """
     
-    prompt_text = "".join(tokenized_text)
+    prompt_text = " ".join(tokenized_text)
+    prompt_text = prompt_text.replace(" 's", "'s")
+    prompt_text = prompt_text.replace(" ( ", " (")
+    prompt_text = prompt_text.replace(" ) ", ") ")
+    prompt_text = prompt_text.replace(" , ", ", ")
+    prompt_text = prompt_text.replace(" . ", ". ")
+    prompt_text = prompt_text.replace(" : ", ": ")
+    prompt_text = prompt_text.replace(" ; ", "; ")
+    prompt_text = prompt_text.replace(" ! ", "! ")
+    prompt_text = prompt_text.replace(" ? ", "? ")
+    prompt_text = prompt_text.replace(" % ", "% ")
 
     return prompt_text
 
