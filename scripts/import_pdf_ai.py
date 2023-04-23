@@ -108,7 +108,7 @@ def convert_to_detokenized_text(tokenized_text):
 
     return prompt_text
 
-def call_chatGPT(prompt, temperature=0.1):
+def call_chatGPT(prompt, temperature=0.1, presence_penalty=0.0, frequency_penalty=0.0):
     """Calls the OpenAI API to generate text.
     Args:
         prompt (str): The prompt to use for the API call.
@@ -130,6 +130,8 @@ def call_chatGPT(prompt, temperature=0.1):
         n=1,
         stop=None,
         temperature=temperature,
+        presence_penalty=presence_penalty,
+        frequency_penalty=frequency_penalty
     )
     
     # Nb to tokens in the response
@@ -146,7 +148,7 @@ def call_chatGPT(prompt, temperature=0.1):
 
     return response.choices[0].message.content
 
-def process_long_text_through_openai_into_chunks(prompt, text, chunk_size):
+def process_long_text_through_openai_into_chunks(prompt, text, chunk_size, save_chunks=False, save_path=None):
     """Processes a long text through the OpenAI API.
     Args:
         prompt (str): The prompt to use for the API call.
@@ -162,10 +164,21 @@ def process_long_text_through_openai_into_chunks(prompt, text, chunk_size):
     for i, chunk in enumerate(list_chunk):
         local_text = convert_to_detokenized_text(chunk)
         print(f"Cleaning up chunk {i}/ {len(list_chunk)}")
-        submit_prompt = prompt + local_text
+        # ChatGPT has a un-tenable desire to finish sentences so we add a . at the end of the prompt
+        submit_prompt = prompt + "\n\n" + local_text + "."
+        if save_chunks:
+            # We save the input prompt chunk
+            chunk_path = save_path.replace(".pdf", f"_input_chunk_{i}.txt")
+            with open(chunk_path, "w") as f:
+                f.write(submit_prompt)
 
-        result = call_chatGPT(submit_prompt)
-
+        result = call_chatGPT(submit_prompt, temperature=0, presence_penalty= -0.5)
+        if save_chunks:
+            # We save the output prompt chunk
+            chunk_path = save_path.replace(".pdf", f"_output_chunk_{i}.txt")
+            with open(chunk_path, "w") as f:
+                f.write(result)
+                
         all_processed.append(result)
 
     concatenated_summaries = "".join(all_processed)
@@ -190,10 +203,10 @@ def summarize_text_into_chunks(text):
         print(f"Summarizing chunk {i}/ {len(list_chunk)}")
         # We take 100 characters from the previous paragraph
         prompt = "Write a long, very detailed summary for a technical expert\
-                of the following paragraph, from a paper, refering to the text as -This publication-:\n" \
-                + local_text
+                of the following paragraph, from a paper, refering to the text as -This publication-:" \
+                + "\n\n" + local_text
 
-        result = call_chatGPT(prompt, temperature=0.5)
+        result = call_chatGPT(prompt, temperature=0, presence_penalty= -0.5)
 
         all_summaries.append(result)
 
@@ -233,6 +246,10 @@ if __name__ == "__main__":
                         type=int,
                         default=1)
 
+    parser.add_argument('--save_chunks',
+                        help='Save the chunks in a txt file along the pdf file, useful for debugging',
+                        type=bool,
+                        default=False)
     args = parser.parse_args()
 
     pdf_path = args.path_pdf
@@ -240,6 +257,7 @@ if __name__ == "__main__":
     save_raw_text = args.save_raw_text
     save_compressed_text = args.save_compressed_text
     chunk_length = args.chunk_length
+    save_chunks = args.save_chunks
 
     # Extract text from the PDF
     laparams = LAParams()
@@ -263,8 +281,8 @@ if __name__ == "__main__":
 
     # We first clean up the text
     print("Cleaning up and compressing the text")
-    prompt = "Clean up formatting, Remove the abstract, Remove author list, Remove figure captions, Remove references & bibliography, Remove page number, Remove headers and Remove footers from the following text from a scientific publication. Don't change any other words:"
-    text_compressed = process_long_text_through_openai_into_chunks(prompt, text, chunk_size=1500)
+    prompt = "Clean up formatting, Remove author list, Remove references & bibliography, Remove page number, Remove headers and Remove footers from the following text from a scientific publication. Don't change any other words:"
+    text_compressed = process_long_text_through_openai_into_chunks(prompt, text, chunk_size=1400, save_chunks=save_chunks, save_path=pdf_path)
 
     # We save the raw text in a txt file
     if save_compressed_text:
@@ -285,10 +303,10 @@ if __name__ == "__main__":
         print("Cleaning up the summary")
         # We count the number of tokens
         # If it small enough, we send the text for a last clean up. 
-        prompt = "Can you clean up this publication summary to make it flow logically. Keep this summary very technical and detailed:\n" \
-                + current_text
+        prompt = "Can you clean up this publication summary to make it flow logically. Keep this summary very technical and detailed:" \
+                 + "\n\n" +  current_text
 
-        current_text = call_chatGPT(prompt)
+        current_text = call_chatGPT(prompt, temperature=0, presence_penalty= -0.5)
 
     # We save the summary in a txt file
     if save_summary:
