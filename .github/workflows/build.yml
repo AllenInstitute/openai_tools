@@ -25,7 +25,7 @@ jobs:
         run: pip freeze
 
       - name: Installing requirements
-        run: python setup.py install
+        run: pip install .
 
       - name: Installing dev requirements
         run: pip install -r dev_requirements.txt
