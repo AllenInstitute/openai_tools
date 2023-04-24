@@ -9,7 +9,7 @@ Before committing to the repo
 
 ```flake8```
 
-3. If any linting errors, try: 
+3. If there are any linting errors, try: 
 
 ```autopep8 --in-place --aggressive --aggressive --recursive ./```
 
