@@ -8,21 +8,25 @@ Running
 
 1. At the moment, there is a simple script. To run it, you first need to create your conda environment as :
 
-```conda create --name <your_env_name> --file requirements.txt```
+```conda create --name <your_env_name> python=3.10```
 
 2. Then activate it: 
 
 ```conda activate <your_env_name>```
 
-3. Go the script folder:
+3. Install the package 
+
+```pip install .```
+
+4. Go the script folder:
 
 ```cd scripts```
 
-4. Copy your openAi API key in the .env file. You can find this here: https://platform.openai.com/account/api-keys
+5. Copy your openAi API key in the .env file. You can find this here: https://platform.openai.com/account/api-keys
 
-5. Run it using:
+6. Run it using:
 
-```python import_pdf_ai.py --path_pdf <path_to_your_pdf> --save_summary True```
+```python pdf_summary.py --path_pdf <path_to_your_pdf> --save_summary True```
 
 This will save a little text file along with your pdf with the same filename but with a .txt extension. 
 
@@ -47,12 +51,6 @@ Type: boolean
 
 Default: False
 
---save_compressed_text: Save the compressed text in a txt file along the pdf file.
-
-Type: boolean
-
-Default: False
-
 --cut_bibliography: Try not to summarize the bibliography at the end of the PDF file.
 
 Type: boolean
@@ -69,6 +67,13 @@ Example
 ========================
 See the example/ folder for example runs. 
 There is a typical short example (length of a typical abstract) and a long summary (using chunk_length 4). 
+
+How to contribute?
+========================
+
+1. First go to tests/ and read the README.md 
+
+2. Make a PR against main. This will run CI through github actions. 
 
 Credits
 ========================
