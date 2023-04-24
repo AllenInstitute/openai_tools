@@ -1,19 +1,22 @@
+import tiktoken
+import argparse
+from dotenv import load_dotenv
+import os
+from nltk.tokenize import word_tokenize
 import openai
 from pdfminer.high_level import extract_text
 from pdfminer.layout import LAParams
 import nltk
-nltk.download('punkt')
-from nltk.tokenize import word_tokenize
-import os
-from dotenv import load_dotenv
-import argparse
-import tiktoken
+
+nltk.download("punkt")
 
 # Load the environment variables from the .env file
 load_dotenv()
 
-# Replace with your own OpenAI API key or set the OPENAI_API_KEY environment variable
-openai.api_key =  os.getenv('OPENAI_API_KEY')
+# Replace with your own OpenAI API key or set the OPENAI_API_KEY
+# environment variable
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
 
 def count_tokens(texts):
     """Counts the number of tokens in a list of texts.
@@ -26,10 +29,12 @@ def count_tokens(texts):
     num_tokens = 0
 
     for message in texts:
-        num_tokens += 4  # every message follows <im_start>{role/name}\n{content}<im_end>\n
+        # every message follows <im_start>{role/name}\n{content}<im_end>\n
+        num_tokens += 4
         num_tokens += len(encoding.encode(message))
-        
+
     return num_tokens
+
 
 def custom_word_tokenize(text):
     """Tokenizes a string.
@@ -44,8 +49,9 @@ def custom_word_tokenize(text):
     for line in lines:
         line_tokens = word_tokenize(line.strip())
         tokens.extend(line_tokens)
-        tokens.append('\n')
+        tokens.append("\n")
     return tokens[:-1]  # Remove the last newline token
+
 
 def break_up_file(tokens, chunk_size, overlap_size):
     """Breaks up a file into chunks of tokens.
@@ -56,14 +62,15 @@ def break_up_file(tokens, chunk_size, overlap_size):
     Returns:
         list: A list of lists of tokens.
     """
+
     def find_sentence_boundary(tokens, start_idx):
         # This is to only cut at the end of the last full sentence.
         current_length = start_idx
         # We go backward until we find a sentence boundary.
         for idx, token in enumerate(tokens[start_idx::-1]):
-            if token in {'.', '!', '?'}:
+            if token in {".", "!", "?"}:
                 current_length = start_idx - idx
-                break    
+                break
         return current_length
 
     if len(tokens) <= chunk_size:
@@ -72,7 +79,10 @@ def break_up_file(tokens, chunk_size, overlap_size):
         end_idx = find_sentence_boundary(tokens, chunk_size)
         chunk = tokens[:end_idx]
         yield chunk
-        yield from break_up_file(tokens[end_idx - overlap_size:], chunk_size, overlap_size)
+        yield from break_up_file(
+            tokens[end_idx - overlap_size:], chunk_size, overlap_size
+        )
+
 
 def break_up_file_to_chunks(text, chunk_size=2000, overlap_size=0):
     """Breaks up a file into chunks of tokens.
@@ -86,14 +96,15 @@ def break_up_file_to_chunks(text, chunk_size=2000, overlap_size=0):
     tokens = custom_word_tokenize(text)
     return list(break_up_file(tokens, chunk_size, overlap_size))
 
+
 def convert_to_detokenized_text(tokenized_text):
     """Converts a list of tokens to a detokenized string.
     Args:
         tokenized_text (list): A list of tokens.
         Returns:
         str: A detokenized string.
-        """
-    
+    """
+
     prompt_text = " ".join(tokenized_text)
     prompt_text = prompt_text.replace(" 's", "'s")
     prompt_text = prompt_text.replace(" ( ", " (")
@@ -108,7 +119,12 @@ def convert_to_detokenized_text(tokenized_text):
 
     return prompt_text
 
-def call_chatGPT(prompt, temperature=0.1, presence_penalty=0.0, frequency_penalty=0.0):
+
+def call_chatGPT(
+        prompt,
+        temperature=0.1,
+        presence_penalty=0.0,
+        frequency_penalty=0.0):
     """Calls the OpenAI API to generate text.
     Args:
         prompt (str): The prompt to use for the API call.
@@ -131,9 +147,9 @@ def call_chatGPT(prompt, temperature=0.1, presence_penalty=0.0, frequency_penalt
         stop=None,
         temperature=temperature,
         presence_penalty=presence_penalty,
-        frequency_penalty=frequency_penalty
+        frequency_penalty=frequency_penalty,
     )
-    
+
     # Nb to tokens in the response
     NbTokensInResponse = count_tokens([response.choices[0].message.content])
     print(f"Number of tokens in the response: {NbTokensInResponse}")
@@ -144,11 +160,15 @@ def call_chatGPT(prompt, temperature=0.1, presence_penalty=0.0, frequency_penalt
 
     # We error out if the response was stopped before the end.
     if response.choices[0].finish_reason == "length":
-        raise Exception("We stopped because we didn't reach the end of the LLM text.")
+        raise Exception(
+            "We stopped because we didn't reach the end of the LLM text.")
 
     return response.choices[0].message.content
 
-def process_long_text_through_openai_into_chunks(prompt, text, chunk_size, save_chunks=False, save_path=None):
+
+def process_long_text_through_openai_into_chunks(
+    prompt, text, chunk_size, save_chunks=False, save_path=None
+):
     """Processes a long text through the OpenAI API.
     Args:
         prompt (str): The prompt to use for the API call.
@@ -157,14 +177,15 @@ def process_long_text_through_openai_into_chunks(prompt, text, chunk_size, save_
     Returns:
         str: The processed text.
     """
-    
+
     list_chunk = break_up_file_to_chunks(text, chunk_size=chunk_size)
     all_processed = []
     print(f"Number of chunks to compress: {len(list_chunk)}")
     for i, chunk in enumerate(list_chunk):
         local_text = convert_to_detokenized_text(chunk)
         print(f"Cleaning up chunk {i}/ {len(list_chunk)}")
-        # ChatGPT has a un-tenable desire to finish sentences so we add a . at the end of the prompt
+        # ChatGPT has a un-tenable desire to finish sentences so we add a . at
+        # the end of the prompt
         submit_prompt = prompt + "\n\n" + local_text + "."
         if save_chunks:
             # We save the input prompt chunk
@@ -172,23 +193,27 @@ def process_long_text_through_openai_into_chunks(prompt, text, chunk_size, save_
             with open(chunk_path, "w") as f:
                 f.write(submit_prompt)
 
-        result = call_chatGPT(submit_prompt, temperature=0, presence_penalty= -0.5)
+        result = call_chatGPT(
+            submit_prompt,
+            temperature=0,
+            presence_penalty=-0.5)
         if save_chunks:
             # We save the output prompt chunk
             chunk_path = save_path.replace(".pdf", f"_output_chunk_{i}.txt")
             with open(chunk_path, "w") as f:
                 f.write(result)
-                
+
         all_processed.append(result)
 
     concatenated_summaries = "".join(all_processed)
 
     return concatenated_summaries
 
+
 def summarize_text_into_chunks(text):
     """Summarizes a text into chunks.
     Args:
-        text (str): The text to summarize. 
+        text (str): The text to summarize.
     Returns:
         str: The summarized text.
         int: The number of chunks.
@@ -202,11 +227,15 @@ def summarize_text_into_chunks(text):
 
         print(f"Summarizing chunk {i}/ {len(list_chunk)}")
         # We take 100 characters from the previous paragraph
-        prompt = "Write a long, very detailed summary for a technical expert\
-                of the following paragraph, from a paper, refering to the text as -This publication-:" \
-                + "\n\n" + local_text
+        prompt = (
+            "Write a long, very detailed summary for a technical expert\
+            of the following paragraph, from a paper, refering to the \
+            text as -This publication-:"
+            + "\n\n"
+            + local_text
+        )
 
-        result = call_chatGPT(prompt, temperature=0, presence_penalty= -0.5)
+        result = call_chatGPT(prompt, temperature=0, presence_penalty=-0.5)
 
         all_summaries.append(result)
 
@@ -214,42 +243,63 @@ def summarize_text_into_chunks(text):
     nb_chunks = len(list_chunk)
     return concatenated_summaries, nb_chunks
 
+
 if __name__ == "__main__":
     script_path = os.path.dirname(os.path.realpath(__file__))
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--path_pdf', 
-                        help='Path to a pdf file', 
-                        type=str, 
-                        default=os.path.join(script_path, '../example/2020.12.15.422967v4.full.pdf'))
-    parser.add_argument('--save_summary', 
-                        help='Save the summary in a txt file along the pdf file', 
-                        type=bool, 
-                        default=True)
-    parser.add_argument('--save_raw_text', 
-                        help='Save the raw text in a txt file along the pdf file', 
-                        type=bool, 
-                        default=False)
-    parser.add_argument('--save_compressed_text',
-                        help='Save the compressed text in a txt file along the pdf file',
-                        type=bool,
-                        default=False)
-    parser.add_argument('--cut_bibliography',
-                        help='Try not to summarize the bibliography at the end of the pdf file',
-                        type=bool,
-                        default=True)
-   
-    parser.add_argument('--chunk_length',
-                        help='This is to increase the final length of the summary. The document is summarized in chunks. More \
-                        chunks means a longer summary. Inconsitencty across the sections could occur with larger number. Typically \
-                        1 is a good value for an abstract and 2, 3 for more details.',
-                        type=int,
-                        default=1)
+    parser.add_argument(
+        "--path_pdf",
+        help="Path to a pdf file",
+        type=str,
+        default=os.path.join(
+            script_path,
+            "../example/2020.12.15.422967v4.full.pdf"),
+    )
+    parser.add_argument(
+        "--save_summary",
+        help="Save the summary in a txt file along the pdf file",
+        type=bool,
+        default=True,
+    )
+    parser.add_argument(
+        "--save_raw_text",
+        help="Save the raw text in a txt file along the pdf file",
+        type=bool,
+        default=False,
+    )
+    parser.add_argument(
+        "--save_compressed_text",
+        help="Save the compressed text in a txt file along the pdf file",
+        type=bool,
+        default=False,
+    )
+    parser.add_argument(
+        "--cut_bibliography",
+        help="Try not to summarize the bibliography at the end \
+            of the pdf file",
+        type=bool,
+        default=True,
+    )
 
-    parser.add_argument('--save_chunks',
-                        help='Save the chunks in a txt file along the pdf file, useful for debugging',
-                        type=bool,
-                        default=False)
+    parser.add_argument(
+        "--chunk_length",
+        help="This is to increase the final length of the summary. The \
+            document is summarized in chunks. More chunks means a longer \
+            summary. Inconsitencty across the sections could occur with \
+            larger number. Typically 1 is a good value for an abstract and \
+            2, 3 for more details.",
+        type=int,
+        default=1,
+    )
+
+    parser.add_argument(
+        "--save_chunks",
+        help="Save the chunks in a txt file along the pdf file, useful \
+            for debugging",
+        type=bool,
+        default=False,
+    )
     args = parser.parse_args()
 
     pdf_path = args.path_pdf
@@ -267,7 +317,7 @@ if __name__ == "__main__":
     if save_raw_text:
         raw_text_path = pdf_path.replace(".pdf", "_raw.txt")
         with open(raw_text_path, "w") as f:
-            f.write(text)   
+            f.write(text)
 
     # We remove the bibliography
     # This is a very low tech way to do it, we will improve it later
@@ -281,32 +331,46 @@ if __name__ == "__main__":
 
     # We first clean up the text
     print("Cleaning up and compressing the text")
-    prompt = "Clean up formatting, Remove author list, Remove references & bibliography, Remove page number, Remove headers and Remove footers from the following text from a scientific publication. Don't change any other words:"
-    text_compressed = process_long_text_through_openai_into_chunks(prompt, text, chunk_size=1400, save_chunks=save_chunks, save_path=pdf_path)
+    prompt = "Clean up formatting, Remove author list, Remove references & \
+        bibliography, Remove page number, Remove headers and Remove footers \
+        from the following text from a scientific publication. Don't change \
+        any other words:"
+    text_compressed = process_long_text_through_openai_into_chunks(
+        prompt,
+        text,
+        chunk_size=1400,
+        save_chunks=save_chunks,
+        save_path=pdf_path,
+    )
 
     # We save the raw text in a txt file
     if save_compressed_text:
         raw_text_path = pdf_path.replace(".pdf", "_compressed.txt")
         with open(raw_text_path, "w") as f:
-            f.write(text_compressed)   
+            f.write(text_compressed)
 
     # We summarize the text into chunks
     nb_chunks = 10
 
     current_text = text_compressed
-    while (nb_chunks > chunk_length):        
+    while nb_chunks > chunk_length:
         current_text, nb_chunks = summarize_text_into_chunks(current_text)
         print(f"Current number of chunks:{nb_chunks}")
-    
+
     # We can afford to clean up if the text is not too long
-    if ((nb_chunks > 1) & (count_tokens([current_text]) < 2000)):
+    if (nb_chunks > 1) & (count_tokens([current_text]) < 2000):
         print("Cleaning up the summary")
         # We count the number of tokens
-        # If it small enough, we send the text for a last clean up. 
-        prompt = "Can you clean up this publication summary to make it flow logically. Keep this summary very technical and detailed:" \
-                 + "\n\n" +  current_text
+        # If it small enough, we send the text for a last clean up.
+        prompt = (
+            "Can you clean up this publication summary to make it flow \
+            logically. Keep this summary very technical and detailed:"
+            + "\n\n"
+            + current_text
+        )
 
-        current_text = call_chatGPT(prompt, temperature=0, presence_penalty= -0.5)
+        current_text = call_chatGPT(
+            prompt, temperature=0, presence_penalty=-0.5)
 
     # We save the summary in a txt file
     if save_summary:
