@@ -9,10 +9,13 @@ with open("LICENSE") as f:
 with open("requirements.txt", "r") as f:
     required = f.read().splitlines()
 
+with open("dev_requirements.txt", "r") as f:
+    dev_required = f.read().splitlines()
+
 setup(
     name="papers_extractor",
     description="Extract summaries and reviews from papers using AI",
-    long_description_content_type="text/x-rst",
+    long_description_content_type="text/markdown",
     long_description=readme,
     author="Jerome Lecoq",
     version='0.1.0',
@@ -22,4 +25,7 @@ setup(
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     install_requires=required,
+    extras_require={
+        "dev": dev_required
+    },
 )

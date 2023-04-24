@@ -1,0 +1,34 @@
+
+name: build
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      DANDI_API_KEY: ${{ secrets.DANDI_API_KEY }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Upgrading pip
+        run: pip install --upgrade pip
+
+      - name: print environment
+        run: pip freeze
+
+      - name: Installing requirements
+        run: python setup.py install
+
+      - name: Installing dev requirements
+        run: pip install -r dev_requirements.txt
+
+      - name: Testing package classes
+        run: pytest
