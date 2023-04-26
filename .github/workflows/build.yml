@@ -32,3 +32,5 @@ jobs:
 
       - name: Testing package classes
         run: pytest
+        env: # Or as an environment variable
+          OPEN_API_KEY: ${{ secrets.OPEN_API_KEY }}
