@@ -3,14 +3,10 @@
 from papers_extractor.openai_parsers import OpenaiLongParser
 import os
 import openai
-from dotenv import load_dotenv
-
-# Load the environment variables from the .env file
-load_dotenv()
 
 # Replace with your own OpenAI API key or set the OPENAI_API_KEY
 # environment variable
-openai.api_key = os.getenv("OPENAI_API_KEY")
+openai.api_key = os.environ["OPENAI_API_KEY"]
 
 # We first test a call to the API
 
