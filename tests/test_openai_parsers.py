@@ -13,8 +13,10 @@ load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # We first test a call to the API
+
+
 def test_api_call():
-    os.environ["OPENAI_API_KEY"] = "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"
     openai_long_parser = OpenaiLongParser("Test prompt")
-    response = openai_long_parser.call_chatGPT("Say Hello World, I am a test.", temperature=0)
+    response = openai_long_parser.call_chatGPT(
+        "Say Hello World, I am a test.", temperature=0)
     assert response == 'Hello World, I am a test.'
