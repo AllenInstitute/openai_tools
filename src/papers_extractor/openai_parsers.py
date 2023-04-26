@@ -91,9 +91,9 @@ class OpenaiLongParser:
             yield tokens
         else:
             end_idx = find_sentence_boundary(tokens, chunk_size)
-            chunk = tokens[:end_idx]
+            chunk = tokens[:end_idx + 1]
             yield chunk
-            yield from self.break_up_tokens_in_chunks(tokens[end_idx:],
+            yield from self.break_up_tokens_in_chunks(tokens[end_idx + 1:],
                                                       chunk_size)
 
     def convert_to_detokenized_text(self, tokenized_text):
@@ -110,10 +110,13 @@ class OpenaiLongParser:
         prompt_text = prompt_text.replace(" ) ", ") ")
         prompt_text = prompt_text.replace(" , ", ", ")
         prompt_text = prompt_text.replace(" . ", ". ")
+        prompt_text = prompt_text.replace(" .", ".")
         prompt_text = prompt_text.replace(" : ", ": ")
         prompt_text = prompt_text.replace(" ; ", "; ")
         prompt_text = prompt_text.replace(" ! ", "! ")
         prompt_text = prompt_text.replace(" ? ", "? ")
+        prompt_text = prompt_text.replace(" ?", "?")
+        prompt_text = prompt_text.replace(" !", "!")
         prompt_text = prompt_text.replace(" % ", "% ")
 
         return prompt_text
@@ -183,6 +186,38 @@ class OpenaiLongParser:
 
         return response.choices[0].message.content
 
+    def call_embeddingGPT(
+            self,
+            prompt
+    ):
+        """Calls the OpenAI API to generate embedding from text.
+        Args:
+            prompt (str): The prompt to use for the API call.
+        Returns:
+            str: The generated text.
+        """
+
+        logging.info("Calling the OpenAI API")
+        # Nb of tokens in the prompt
+
+        NbTokensInPrompt = self.count_tokens([prompt])
+
+        logging.info(f"Number of tokens in the text: {NbTokensInPrompt}")
+
+        # Below we call openai endpoint for embeddings
+        prompt = prompt.replace("\n", " ")
+        response = openai.Embedding.create(
+            input=[prompt], model="text-embedding-ada-002")
+
+        return response.embeddings[0]
+
+        response = openai.embedding.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": prompt}],
+        )
+
+        return response.choices[0].message.content
+
     def process_chunks_through_prompt(
         self,
         prompt,
@@ -228,6 +263,34 @@ class OpenaiLongParser:
                 chunk_path = os.path.join(save_path, f"output_chunk_{i}.txt")
                 with open(chunk_path, "w") as f:
                     f.write(result)
+
+            processed_chunks.append(result)
+
+        return processed_chunks
+
+    def process_chunks_through_embedding(
+        self
+    ):
+        """Processes all the chunks through the API to extract embeddings.
+        Args:
+        Returns:
+        """
+
+        list_chunk = self.chunks
+        processed_chunks = []
+        logging.info(f"Number of chunks to embed: {len(list_chunk)}")
+
+        # We replace this with async calls
+        for i, chunk in enumerate(list_chunk):
+            logging.info(f"Processing chunk {i}/ {len(list_chunk)}")
+
+            # ChatGPT has a un-tenable desire to finish sentences so we
+            # add a "." at the end of the prompt
+            submit_text = chunk + "."
+
+            result = self.call_embeddingGPT(
+                submit_text,
+            )
 
             processed_chunks.append(result)
 
