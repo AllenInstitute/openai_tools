@@ -30,5 +30,9 @@ jobs:
       - name: Linting with flake8
         run: flake8
 
-      - name: Testing package classes
+      - name: Testing package classes    
         run: pytest
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        
+
