@@ -31,7 +31,7 @@ jobs:
         run: flake8
 
       - name: Testing package classes       
-        env: # Or as an environment variable
+        env: 
           OPEN_API_KEY: ${{ secrets.OPEN_API_KEY }}
         run: pytest
 
