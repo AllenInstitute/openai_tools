@@ -5,7 +5,6 @@ import os
 import openai
 
 # Replace with your own OpenAI API key or set the OPENAI_API_KEY
-# environment variable
 openai.api_key = os.environ["OPENAI_API_KEY"]
 
 # We first test a call to the API
