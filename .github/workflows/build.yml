@@ -30,7 +30,8 @@ jobs:
       - name: Linting with flake8
         run: flake8
 
-      - name: Testing package classes
-        run: pytest
+      - name: Testing package classes       
         env: # Or as an environment variable
           OPEN_API_KEY: ${{ secrets.OPEN_API_KEY }}
+        run: pytest
+
