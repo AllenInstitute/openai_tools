@@ -51,8 +51,8 @@ class DoiParser:
 
         # If published is biorxiv, then we use the
         # biorxiv api to get the pdf link
-        if metatdata['message']['publisher'] == 'Cold Spring Harbor \
-                Laboratory':
+        if metatdata['message']['publisher'] == ("Cold Spring "
+                                                 "Harbor Laboratory"):
             url = 'https://www.biorxiv.org/content/' + self.doi
 
             response = requests.get(url)
