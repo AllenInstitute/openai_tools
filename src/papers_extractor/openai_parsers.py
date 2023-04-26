@@ -1,12 +1,14 @@
 # This file contains classes to submit texts to the OpenAi API.
 # Some functions will enable processing a prompt in chunks to bypass the
 # tokens limit.
+import asyncio
 import logging
-import tiktoken
 import os
-from nltk.tokenize import word_tokenize
-import openai
+
 import nltk
+import openai
+import tiktoken
+from nltk.tokenize import word_tokenize
 
 nltk.download("punkt")
 
@@ -17,11 +19,12 @@ class OpenaiLongParser:
     tokens limit.
     """
 
-    def __init__(self, longtext, chunk_size=1400):
+    def __init__(self, longtext, chunk_size=1400, max_concurrent_calls=10):
         """Initializes the class.
         Args:
             longtext (str): The text to submit to the API.
             chunk_size (int): The number of tokens in each chunk.
+            max_concurrent_calls (int): The maximum number of concurrent calls to the OpenAI API
         """
 
         self.longtext = longtext
@@ -29,6 +32,7 @@ class OpenaiLongParser:
         self.num_tokens = self.count_tokens([longtext])
         self.break_up_longtext_to_chunks(self.longtext, self.chunk_size)
         self.num_chunks = len(self.chunks)
+        self.max_concurrent_calls = max_concurrent_calls
 
         # We load the API key and send it to OpenAI library
         openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -133,55 +137,75 @@ class OpenaiLongParser:
                                                                chunk_size)
         ]
 
-    def call_chatGPT(
+    async def _worker(self, queue):
+        """An asynchronous worker that sends the requests to the API."""
+        while True:
+            prompt, temperature, presence_penalty, frequency_penalty, result = await queue.get()
+            NbTokensInPrompt = self.count_tokens([prompt])
+            logging.info("Calling OpenAI API on a chunk of text.")
+            logging.info(f"Number of tokens in the prompt: {NbTokensInPrompt}")
+
+            response = await openai.ChatCompletion.acreate(
+                model="gpt-3.5-turbo",
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=4000 - NbTokensInPrompt,
+                n=1,
+                stop=None,
+                temperature=temperature,
+                presence_penalty=presence_penalty,
+                frequency_penalty=frequency_penalty,
+            )
+
+            NbTokensInResponse = self.count_tokens(
+                [response['choices'][0]['message']['content']])
+            logging.info(f"Number of tokens in the response: {NbTokensInResponse}")
+
+            # Total number of tokens
+            TotalNbTokens = NbTokensInPrompt + NbTokensInResponse
+            logging.info(f"Total number of tokens: {TotalNbTokens}")
+
+            # We error out if the response was stopped before the end.
+            if response.choices[0].finish_reason == "length":
+                raise Exception(
+                    "We stopped because we didn't reach the end of the LLM text."
+                )
+
+            result.append(response.choices[0]['message']['content'])
+            queue.task_done()
+
+    async def async_call_chatGPT(self, prompts, temperature, presence_penalty, frequency_penalty):
+        """Low-level async function that calls chatGPT in parallel."""
+        queue = asyncio.Queue()
+        workers = [asyncio.create_task(self._worker(queue)) for _ in range(self.max_concurrent_calls)]
+        
+        results = [list() for _ in range(len(prompts))]
+        for idx, prompt in enumerate(prompts):
+            queue.put_nowait((prompt, temperature, presence_penalty, frequency_penalty, results[idx]))
+
+        await queue.join()
+
+        for worker in workers:
+            worker.cancel()
+
+        return [x[0] for x in results]
+
+    def multi_call_chatGPT(
             self,
-            prompt,
+            prompts,
             temperature=0.1,
             presence_penalty=0.0,
             frequency_penalty=0.0):
-        """Calls the OpenAI API to generate text.
+        """Wrapper that calls the OpenAI API in parallel to generate text.
         Args:
-            prompt (str): The prompt to use for the API call.
-            max_tokens (int): The maximum number of tokens to generate.
+            prompts (List[str]): The prompt to use for the API call.
             temperature (float): The temperature to use for the API call.
+            presence penalty (float): The presence penalty to use for the API call.
+            frequency penalty (float): The frequency penalty to use for the API call.
         Returns:
             str: The generated text.
         """
+        return asyncio.run(self.async_call_chatGPT(prompts, temperature, presence_penalty, frequency_penalty))
 
-        logging.info("Calling the OpenAI API")
-        # Nb of tokens in the prompt
-
-        NbTokensInPrompt = self.count_tokens([prompt])
-
-        logging.info(f"Number of tokens in the prompt: {NbTokensInPrompt}")
-
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=4000 - NbTokensInPrompt,
-            n=1,
-            stop=None,
-            temperature=temperature,
-            presence_penalty=presence_penalty,
-            frequency_penalty=frequency_penalty,
-        )
-
-        # Nb to tokens in the response
-        NbTokensInResponse = self.count_tokens(
-            [response.choices[0].message.content])
-        logging.info(f"Number of tokens in the response: {NbTokensInResponse}")
-
-        # Total number of tokens
-        TotalNbTokens = NbTokensInPrompt + NbTokensInResponse
-        logging.info(f"Total number of tokens: {TotalNbTokens}")
-
-        # We error out if the response was stopped before the end.
-        if response.choices[0].finish_reason == "length":
-            raise Exception(
-                "We stopped because we didn't reach the end of the LLM text."
-            )
-
-        return response.choices[0].message.content
 
     def process_chunks_through_prompt(
         self,
@@ -204,6 +228,7 @@ class OpenaiLongParser:
         logging.info(f"Number of chunks to process: {len(list_chunk)}")
 
         # We replace this with async calls
+        submit_prompts = []
         for i, chunk in enumerate(list_chunk):
             logging.info(f"Processing chunk {i}/ {len(list_chunk)}")
 
@@ -217,18 +242,20 @@ class OpenaiLongParser:
                 with open(chunk_path, "w") as f:
                     f.write(submit_prompt)
 
-            result = self.call_chatGPT(
-                submit_prompt,
-                temperature=temperature,
-                presence_penalty=presence_penalty,
-                frequency_penalty=frequency_penalty,
-            )
+            submit_prompts.append(submit_prompt)
+
+        processed_chunks = self.multi_call_chatGPT(
+            submit_prompts,
+            temperature=temperature,
+            presence_penalty=presence_penalty,
+            frequency_penalty=frequency_penalty,
+        )
+
+        for i, (chunk, result) in enumerate(zip(list_chunk, processed_chunks)):
             if save_path:
                 # We save the output prompt chunk
                 chunk_path = os.path.join(save_path, f"output_chunk_{i}.txt")
                 with open(chunk_path, "w") as f:
                     f.write(result)
-
-            processed_chunks.append(result)
 
         return processed_chunks
