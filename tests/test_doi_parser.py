@@ -28,7 +28,7 @@ def test_title_doi_pdf():
     doi_parser = DoiParser('10.1101/2020.03.03.972133')
     assert doi_parser.get_title(
     ) == ("AI-aided design of novel targeted covalent "
-        "inhibitors against SARS-CoV-2")
+          "inhibitors against SARS-CoV-2")
 
 
 def test_abstract_doi():
