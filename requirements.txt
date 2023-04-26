@@ -6,3 +6,5 @@ python-dotenv==1.0.0
 tiktoken==0.3.3
 wget==3.2
 nltk
+habanero
+bs4
