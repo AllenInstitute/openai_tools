@@ -4,6 +4,7 @@ from habanero import Crossref
 import requests
 from bs4 import BeautifulSoup
 
+
 class DoiParser:
     """This class is used to handle DOI links and extract the
     publication metadata from them.
@@ -31,26 +32,27 @@ class DoiParser:
         metatdata = self.get_doi_metatdata()
         title = metatdata['message']['title'][0]
         return title
-    
+
     def get_abstract(self):
         """This function extracts the abstract from the metadata."""
         metatdata = self.get_doi_metatdata()
         abstract = metatdata['message']['abstract']
         return abstract
-    
+
     def get_authors(self):
         """This function extracts the authors from the metadata."""
         metatdata = self.get_doi_metatdata()
         authors = metatdata['message']['author']
         return authors
-    
+
     def get_pdf_link(self):
         """This function extracts the pdf link from the metadata."""
         metatdata = self.get_doi_metatdata()
 
-        # If published is biorxiv, then we use the 
+        # If published is biorxiv, then we use the
         # biorxiv api to get the pdf link
-        if metatdata['message']['publisher'] == 'Cold Spring Harbor Laboratory':
+        if metatdata['message']['publisher'] == 'Cold Spring Harbor \
+                Laboratory':
             url = 'https://www.biorxiv.org/content/' + self.doi
 
             response = requests.get(url)
@@ -59,7 +61,9 @@ class DoiParser:
                 pdf_link = soup.find('a', class_='article-dl-pdf-link')['href']
                 return f"https://www.biorxiv.org{pdf_link}"
             else:
-                print(f"Error: Unable to fetch biorxiv webpage. Status code {response.status_code}")
+                print(
+                    f"Error: Unable to fetch biorxiv webpage. Status \
+                        code {response.status_code}")
                 return None
         else:
             full_text_links = metatdata['message'].get('link', [])
