@@ -14,8 +14,10 @@ class LongPaper:
         self.longtext = longtext
 
     def summarize_longtext_into_chunks(
-        self, final_chunk_length=2, save_path_summary=None, max_concurrent_calls=10
-    ):
+            self,
+            final_chunk_length=2,
+            save_path_summary=None,
+            max_concurrent_calls=10):
         """This function summarizes a long text into chunks.
         It uses the OpenaiLongParser class to do so.
         """
@@ -31,7 +33,10 @@ class LongPaper:
 
         logging.info("Summarizing the text in chunks")
         while True:
-            local_openai = OpenaiLongParser(current_text, chunk_size=1400, max_concurrent_calls=max_concurrent_calls)
+            local_openai = OpenaiLongParser(
+                current_text,
+                chunk_size=1400,
+                max_concurrent_calls=max_concurrent_calls)
             nb_chunks = len(local_openai.chunks)
             if nb_chunks < final_chunk_length:
                 break
@@ -43,7 +48,10 @@ class LongPaper:
             current_text = "\n".join(summarized_chunks)
 
         # We can afford to clean up if the text is not too long
-        final_long = OpenaiLongParser(current_text, chunk_size=2000, max_concurrent_calls=max_concurrent_calls)
+        final_long = OpenaiLongParser(
+            current_text,
+            chunk_size=2000,
+            max_concurrent_calls=max_concurrent_calls)
         if final_long.num_chunks == 1:
             logging.info("Cleaning up the summary")
 
