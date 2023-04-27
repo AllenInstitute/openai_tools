@@ -1,18 +1,12 @@
 import logging
 import os
 import sys
-
 import pytest
-
 from papers_extractor.long_paper import LongPaper
 from papers_extractor.pdf_parser import PdfParser
 
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(f"{parent_dir}/scripts/")
-
-# This is to force the logging to be printed in the console regardless of the
-# parallelization.
-logging.basicConfig(level=logging.INFO, stream=sys.stdout, force=True)
 
 
 def do_summarization(max_concurrent_calls):
@@ -54,6 +48,6 @@ def test_pdf_summary_parallel():
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.INFO, stream=sys.stdout, force=True)
     test_pdf_summary_parallel()
     test_pdf_summary_sequential()

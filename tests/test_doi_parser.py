@@ -1,4 +1,6 @@
 from papers_extractor.doi_parser import DoiParser
+import logging
+import sys
 
 
 def test_nature_doi_pdf():
@@ -39,3 +41,14 @@ def test_abstract_doi():
 def test_author_doi():
     doi_parser = DoiParser('10.1101/2020.03.03.972133')
     assert doi_parser.get_authors()[0]['given'] == 'Bowen'
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, stream=sys.stdout, force=True)
+    test_nature_doi_pdf()
+    test_biorxiv1_doi_pdf()
+    test_biorxiv2_doi_pdf()
+    test_cell_doi_pdf()
+    test_title_doi_pdf()
+    test_abstract_doi()
+    test_author_doi()

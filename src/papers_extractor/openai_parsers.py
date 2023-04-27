@@ -239,7 +239,7 @@ class OpenaiLongParser:
         Args:
             prompt (str): The prompt to use for the API call.
         Returns:
-            str: The generated text.
+            array: The embedding.
         """
 
         logging.info("Calling the OpenAI API")
@@ -251,17 +251,13 @@ class OpenaiLongParser:
 
         # Below we call openai endpoint for embeddings
         prompt = prompt.replace("\n", " ")
+
         response = openai.Embedding.create(
             input=[prompt], model="text-embedding-ada-002")
 
-        return response.embeddings[0]
+        embedding = response['data'][0]['embedding']
 
-        response = openai.embedding.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": prompt}],
-        )
-
-        return response.choices[0].message.content
+        return embedding
 
     def process_chunks_through_prompt(
         self,
