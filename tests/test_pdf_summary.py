@@ -10,16 +10,31 @@ from papers_extractor.pdf_parser import PdfParser
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(f"{parent_dir}/scripts/")
 
+# This is to force the logging to be printed in the console regardless of the
+# parallelization.
+logging.basicConfig(level=logging.INFO, stream=sys.stdout, force=True)
+
 
 def do_summarization(max_concurrent_calls):
     """Test out summarization of a pdf file."""
     pdf_path = f"{parent_dir}/example/2021.01.15.426915v3.full.pdf"
+
+
     pdf_parser = PdfParser(pdf_path, cut_bibliography=True)
+
+    # We only take the first 1000 characters for the test
+    pdf_parser.raw_text = pdf_parser.raw_text[0:1000]
+
+    # We first check if cleaned text exists
+    if not pdf_parser.cleaned_text is None:
+        pdf_parser.cleaned_text = pdf_parser.cleaned_text[0:1000]
+
+    # We bypass the cleaning of the text for the test
     cleaned_text = pdf_parser.get_clean_text()
 
     # We then use the long paper parser to summarize the content
     paper_parser = LongPaper(cleaned_text)
-
+    
     summary = paper_parser.summarize_longtext_into_chunks(
         final_chunk_length=2,
         save_path_summary=None,
