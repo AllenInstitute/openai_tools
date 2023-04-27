@@ -251,10 +251,13 @@ class OpenaiLongParser:
 
         # Below we call openai endpoint for embeddings
         prompt = prompt.replace("\n", " ")
+
         response = openai.Embedding.create(
             input=[prompt], model="text-embedding-ada-002")
+        
+        embedding = response['data'][0]['embedding']
 
-        return response.embeddings[0]
+        return embedding
 
     def process_chunks_through_prompt(
         self,
