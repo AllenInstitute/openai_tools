@@ -13,6 +13,17 @@ class LongPaper:
         """Initializes the class with the long text."""
         self.longtext = longtext
 
+    def calculate_embedding(self, chunk_size=3000, parser="GPT"):
+        """This function extracts semantic embeddings in chunks"""
+
+        if parser == "GPT":
+            local_openai = OpenaiLongParser(self.longtext,
+                                            chunk_size=chunk_size)
+            self.embedding = local_openai.process_chunks_through_embedding()
+            return self.embedding
+        else:
+            logging.ERROR("Currently only GPT is supported for embedding")
+            
     def summarize_longtext_into_chunks(
             self,
             final_chunk_length=2,
