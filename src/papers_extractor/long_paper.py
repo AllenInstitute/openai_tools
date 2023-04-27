@@ -49,7 +49,7 @@ class LongPaper:
                 chunk_size=1400,
                 max_concurrent_calls=max_concurrent_calls)
             nb_chunks = len(local_openai.chunks)
-            if nb_chunks < final_chunk_length:
+            if nb_chunks <= final_chunk_length:
                 break
             logging.info(f"Summarizing chunks:{nb_chunks}")
 
