@@ -3,6 +3,8 @@
 from papers_extractor.openai_parsers import OpenaiLongParser
 import os
 import openai
+import logging
+import sys
 
 # Replace with your own OpenAI API key or set the OPENAI_API_KEY
 openai.api_key = os.environ["OPENAI_API_KEY"]
@@ -146,3 +148,18 @@ def test_process_chunks_through_prompt():
     response = ['Hello World!',
                 'Hello World!']
     assert reply == response
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, stream=sys.stdout, force=True)
+    test_api_call()
+    test_counter()
+    test_custom_word_tokenize()
+    test_break_up_veryshortsentence_to_chunks()
+    test_break_up_veryshortendedsentence_to_chunks()
+    test_break_up_shortsentences_to_chunks()
+    test_break_up_longsentences_to_chunks()
+    test_break_up_threesentences_to_chunks()
+    test_break_up_groupsentences_to_chunks()
+    test_break_up_unfinishedsentences_to_chunks()
+    test_break_up_unfinishedgroupsentences_to_chunks()
+    test_process_chunks_through_prompt()
