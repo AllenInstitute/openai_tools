@@ -12,9 +12,9 @@ openai.api_key = os.environ["OPENAI_API_KEY"]
 
 def test_api_call():
     openai_long_parser = OpenaiLongParser("Test prompt")
-    response = openai_long_parser.call_chatGPT(
-        "Say Hello World, I am a test.", temperature=0)
-    assert response == 'Hello World, I am a test.'
+    response = openai_long_parser.multi_call_chatGPT(
+        ["Say Hello World, I am a test."], temperature=0)
+    assert response == ['Hello World, I am a test.']
 
 
 def test_counter():
