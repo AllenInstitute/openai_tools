@@ -115,4 +115,4 @@ class PdfParser:
 
             self.save_cleaned_text()
 
-            return self.save_cleaned_text
+            return self.cleaned_text
