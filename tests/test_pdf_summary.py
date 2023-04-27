@@ -1,9 +1,7 @@
 import logging
 import os
 import sys
-
 import pytest
-
 from papers_extractor.long_paper import LongPaper
 from papers_extractor.pdf_parser import PdfParser
 
@@ -54,6 +52,6 @@ def test_pdf_summary_parallel():
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.INFO, stream=sys.stdout, force=True)
     test_pdf_summary_parallel()
     test_pdf_summary_sequential()

@@ -14,3 +14,8 @@ def test_read_pdf():
 
     print(pdf_parser.raw_text[0:9])
     assert pdf_parser.raw_text[0:16] == 'bioRxiv preprint'
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, stream=sys.stdout, force=True)
+    test_read_pdf()
+    
