@@ -11,6 +11,7 @@ def test_creating_longtext_short_text():
 
     assert long_paper_obj.longtext == longtext
 
+
 def test_summarizing_single_chunk_output():
     longtext = "This is a test."
     long_paper_obj = LongPaper(longtext)
@@ -22,6 +23,7 @@ def test_summarizing_single_chunk_output():
 
     assert len(summary[0]) > 0
     assert len(summary) == 1
+
 
 def test_summarizing_double_chunk_output():
     longtext = "This is a test"
@@ -35,6 +37,7 @@ def test_summarizing_double_chunk_output():
     assert len(summary[0]) > 0
     assert len(summary) == 1
 
+
 def test_embedding_chunks():
     longtext = "This is a test. It contains two sentences."
     long_paper_obj = LongPaper(longtext)
@@ -42,10 +45,11 @@ def test_embedding_chunks():
     assert long_paper_obj.longtext == longtext
 
     embeddings = long_paper_obj.calculate_embedding(
-        chunk_size = 5)
-    
+        chunk_size=5)
+
     assert len(embeddings[0]) == 1536
     assert len(embeddings) == 2
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, stream=sys.stdout, force=True)

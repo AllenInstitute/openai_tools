@@ -254,7 +254,7 @@ class OpenaiLongParser:
 
         response = openai.Embedding.create(
             input=[prompt], model="text-embedding-ada-002")
-        
+
         embedding = response['data'][0]['embedding']
 
         return embedding
