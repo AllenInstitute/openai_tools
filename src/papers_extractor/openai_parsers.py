@@ -24,7 +24,8 @@ class OpenaiLongParser:
         Args:
             longtext (str): The text to submit to the API.
             chunk_size (int): The number of tokens in each chunk.
-            max_concurrent_calls (int): The maximum number of concurrent calls to the OpenAI API
+            max_concurrent_calls (int): The maximum number of concurrent
+            calls to the OpenAI API
         """
 
         self.longtext = longtext
@@ -140,7 +141,10 @@ class OpenaiLongParser:
     async def _worker(self, queue):
         """An asynchronous worker that sends the requests to the API."""
         while True:
-            prompt, temperature, presence_penalty, frequency_penalty, result = await queue.get()
+            (prompt, temperature,
+             presence_penalty, frequency_penalty,
+             result
+             ) = await queue.get()
             NbTokensInPrompt = self.count_tokens([prompt])
             logging.info("Calling OpenAI API on a chunk of text.")
             logging.info(f"Number of tokens in the prompt: {NbTokensInPrompt}")
@@ -158,7 +162,8 @@ class OpenaiLongParser:
 
             NbTokensInResponse = self.count_tokens(
                 [response['choices'][0]['message']['content']])
-            logging.info(f"Number of tokens in the response: {NbTokensInResponse}")
+            logging.info(
+                f"Number of tokens in the response: {NbTokensInResponse}")
 
             # Total number of tokens
             TotalNbTokens = NbTokensInPrompt + NbTokensInResponse
@@ -167,20 +172,30 @@ class OpenaiLongParser:
             # We error out if the response was stopped before the end.
             if response.choices[0].finish_reason == "length":
                 raise Exception(
-                    "We stopped because we didn't reach the end of the LLM text."
+                    "We stopped because we didn't reach \
+                        the end of the LLM text."
                 )
 
             result.append(response.choices[0]['message']['content'])
             queue.task_done()
 
-    async def async_call_chatGPT(self, prompts, temperature, presence_penalty, frequency_penalty):
+    async def async_call_chatGPT(self, prompts, temperature,
+                                 presence_penalty, frequency_penalty):
         """Low-level async function that calls chatGPT in parallel."""
         queue = asyncio.Queue()
-        workers = [asyncio.create_task(self._worker(queue)) for _ in range(self.max_concurrent_calls)]
-        
+        workers = [
+            asyncio.create_task(
+                self._worker(queue)) for _ in range(
+                self.max_concurrent_calls)]
+
         results = [list() for _ in range(len(prompts))]
         for idx, prompt in enumerate(prompts):
-            queue.put_nowait((prompt, temperature, presence_penalty, frequency_penalty, results[idx]))
+            queue.put_nowait(
+                (prompt,
+                 temperature,
+                 presence_penalty,
+                 frequency_penalty,
+                 results[idx]))
 
         await queue.join()
 
@@ -199,13 +214,19 @@ class OpenaiLongParser:
         Args:
             prompts (List[str]): The prompt to use for the API call.
             temperature (float): The temperature to use for the API call.
-            presence penalty (float): The presence penalty to use for the API call.
-            frequency penalty (float): The frequency penalty to use for the API call.
+            presence penalty (float): The presence penalty to use for
+            the API call.
+            frequency penalty (float): The frequency penalty to use for
+            the API call.
         Returns:
             str: The generated text.
         """
-        return asyncio.run(self.async_call_chatGPT(prompts, temperature, presence_penalty, frequency_penalty))
-
+        return asyncio.run(
+            self.async_call_chatGPT(
+                prompts,
+                temperature,
+                presence_penalty,
+                frequency_penalty))
 
     def process_chunks_through_prompt(
         self,
