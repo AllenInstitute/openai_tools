@@ -11,6 +11,7 @@ def test_summarize_longtext_into_chunks_short_text():
 
     assert long_paper_obj.longtext == longtext
 
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, stream=sys.stdout, force=True)
     test_summarize_longtext_into_chunks_short_text()

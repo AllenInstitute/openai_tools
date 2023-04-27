@@ -31,5 +31,5 @@ class MultiPaper:
 
     def cluster_papers(self, n_cluster, cluster_tool="kmean"):
         """This will cluster group of papers to find semantic close papers"""
-
+        labelled_clusters = ''
         return labelled_clusters

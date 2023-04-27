@@ -23,7 +23,7 @@ class LongPaper:
             return self.embedding
         else:
             logging.ERROR("Currently only GPT is supported for embedding")
-            
+
     def summarize_longtext_into_chunks(
             self,
             final_chunk_length=2,

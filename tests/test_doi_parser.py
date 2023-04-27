@@ -2,6 +2,7 @@ from papers_extractor.doi_parser import DoiParser
 import logging
 import sys
 
+
 def test_nature_doi_pdf():
     doi_parser = DoiParser('110.1038/nature12373')
     assert doi_parser.get_pdf_link() == \
@@ -40,6 +41,7 @@ def test_abstract_doi():
 def test_author_doi():
     doi_parser = DoiParser('10.1101/2020.03.03.972133')
     assert doi_parser.get_authors()[0]['given'] == 'Bowen'
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, stream=sys.stdout, force=True)
