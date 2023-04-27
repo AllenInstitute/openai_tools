@@ -17,8 +17,16 @@ def test_api_embedding_call():
     assert len(response) == 1536
 
 
+def test_api_chunk_embedding_call():
+    test_str = 'Hello World! \
+        Hello World!'
+    openai_long_parser = OpenaiLongParser(test_str)
+    openai_long_parser.break_up_longtext_to_chunks(test_str, chunk_size=3)
+    response = openai_long_parser.process_chunks_through_embedding()
+    assert len(response) == 2
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, stream=sys.stdout, force=True)
     test_api_embedding_call()
-
+    test_api_chunk_embedding_call()
