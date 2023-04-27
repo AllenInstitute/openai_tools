@@ -14,7 +14,6 @@ def test_read_pdf():
     pdf_parser = PdfParser(example_pdf)
     pdf_parser.load_raw_text()
 
-    print(pdf_parser.raw_text[0:9])
     assert pdf_parser.raw_text[0:16] == 'bioRxiv preprint'
 
 
