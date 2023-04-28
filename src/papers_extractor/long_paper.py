@@ -83,6 +83,9 @@ class LongPaper:
             )
             current_text = "\n".join(summarized_chunks)
 
+        # This is in case the text is too long to fit in a single chunk
+        final_text = current_text
+
         # We can afford to clean up if the text is not too long
         # Here the chunk size is fixed to maximize the number of tokens
         final_long = OpenaiLongParser(
