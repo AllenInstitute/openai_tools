@@ -14,6 +14,8 @@ nltk.download("punkt")
 
 # Below are methods that can be called outside of the class and
 # therefore have a broader scope.
+
+
 def count_tokens(texts, model="gpt-3.5-turbo-0301"):
     """Counts the number of tokens in the long texts.
     Args:
@@ -32,6 +34,7 @@ def count_tokens(texts, model="gpt-3.5-turbo-0301"):
 
     return num_tokens
 
+
 def custom_word_tokenize(text):
     """Tokenizes a string. Currently using a simpler version of the nltk
     word_tokenize function.
@@ -48,6 +51,7 @@ def custom_word_tokenize(text):
         tokens.extend(line_tokens)
         tokens.append("\n")
     return tokens[:-1]  # Remove the last newline token
+
 
 def custom_word_detokenize(tokenized_text):
     """Converts a list of tokens to a detokenized string.
@@ -78,8 +82,10 @@ def custom_word_detokenize(tokenized_text):
     prompt_text = prompt_text.replace(" 'm", "'m")
 
     return prompt_text
-    
+
 # Below are classes that relates to the OpenAI API.
+
+
 class OpenaiLongParser:
     """This class is used to submit texts to the OpenAi API.
     Some functions will enable processing a prompt in chunks to bypass the
@@ -105,8 +111,6 @@ class OpenaiLongParser:
         # We load the API key and send it to OpenAI library
         openai.api_key = os.getenv("OPENAI_API_KEY")
 
-
-    
     def break_up_tokens_in_chunks(self, tokens):
         """Breaks up a file into chunks of tokens.
         Args:
@@ -133,8 +137,6 @@ class OpenaiLongParser:
             chunk = tokens[:end_idx + 1]
             yield chunk
             yield from self.break_up_tokens_in_chunks(tokens[end_idx + 1:])
-
-
 
     def break_up_longtext_to_chunks(self, text):
         """Breaks up a file into chunks of tokens.
