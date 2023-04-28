@@ -57,7 +57,7 @@ def custom_word_detokenize(tokenized_text):
     """Converts a list of tokens to a detokenized string.
     Args:
         tokenized_text (list): A list of tokens.
-        Returns:
+    Returns:
         str: A detokenized string.
     """
 

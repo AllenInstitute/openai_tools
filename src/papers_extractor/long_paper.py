@@ -7,18 +7,35 @@ from papers_extractor.openai_parsers import OpenaiLongParser
 
 
 class LongPaper:
-    """This class is used to summarize a long text."""
+    """This class is used to summarize the text contained in a long paper.
+    It will be processed in chunks of a given size."""
 
-    def __init__(self, longtext):
-        """Initializes the class with the long text."""
+    def __init__(self, longtext, chunk_size=1400):
+        """Initializes the class with the long text.
+        Args:
+            longtext (str): The long text to summarize.
+            chunk_size (int): The size of the chunks in tokens to use for the
+            chunks. Defaults to 1400.
+        Returns:
+            None
+        """
+
         self.longtext = longtext
+        self.chunk_size = chunk_size
 
-    def calculate_embedding(self, chunk_size=3000, parser="GPT"):
-        """This function extracts semantic embeddings in chunks"""
+    def calculate_embedding(self, parser="GPT"):
+        """This function extracts semantic embeddings in chunks
+        from the long text.
+        Args:
+            parser (str): The parser to use to extract the embeddings.
+            Defaults to GPT.
+        Returns:
+            embedding (list): The list of embeddings for each chunk.
+        """
 
         if parser == "GPT":
             local_openai = OpenaiLongParser(self.longtext,
-                                            chunk_size=chunk_size)
+                                            chunk_size=self.chunk_size)
             self.embedding = local_openai.process_chunks_through_embedding()
             return self.embedding
         else:
@@ -30,7 +47,15 @@ class LongPaper:
             save_path_summary=None,
             max_concurrent_calls=10):
         """This function summarizes a long text into chunks.
-        It uses the OpenaiLongParser class to do so.
+        Args:
+            final_chunk_length (int): The final number of chunks to have.
+            Defaults to 2.
+            save_path_summary (str): The path to save the summary.
+            Defaults to None.
+            max_concurrent_calls (int): The maximum number of concurrent calls
+            to the Openai API. Defaults to 10.
+        Returns:
+            final_text (list): A list of the summary for each chunk.
         """
 
         openai_prompt = "Write a long, very detailed summary for a \
@@ -46,7 +71,7 @@ class LongPaper:
         while True:
             local_openai = OpenaiLongParser(
                 current_text,
-                chunk_size=1400,
+                chunk_size=self.chunk_size,
                 max_concurrent_calls=max_concurrent_calls)
             nb_chunks = len(local_openai.chunks)
             if nb_chunks <= final_chunk_length:
@@ -59,6 +84,7 @@ class LongPaper:
             current_text = "\n".join(summarized_chunks)
 
         # We can afford to clean up if the text is not too long
+        # Here the chunk size is fixed to maximize the number of tokens
         final_long = OpenaiLongParser(
             current_text,
             chunk_size=2000,
