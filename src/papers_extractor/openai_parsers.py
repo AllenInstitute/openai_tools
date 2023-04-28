@@ -12,6 +12,79 @@ from nltk.tokenize import word_tokenize
 
 nltk.download("punkt")
 
+# Below are methods that can be called outside of the class and
+# therefore have a broader scope.
+
+
+def count_tokens(texts, model="gpt-3.5-turbo-0301"):
+    """Counts the number of tokens in the long texts.
+    Args:
+        texts (list): A list of texts.
+        model (str): The model to use.
+    Returns:
+        int: The number of tokens.
+    """
+    encoding = tiktoken.encoding_for_model(model)
+    num_tokens = 0
+
+    for message in texts:
+        # every message follows <im_start>{role/name}\n{content}<im_end>\n
+        num_tokens += 4
+        num_tokens += len(encoding.encode(message))
+
+    return num_tokens
+
+
+def custom_word_tokenize(text):
+    """Tokenizes a string. Currently using a simpler version of the nltk
+    word_tokenize function.
+    Args:
+        text (str): The text to tokenize.
+    Returns:
+        list: A list of tokens.
+    """
+    lines = text.splitlines(True)
+    tokens = []
+    # We tokenize each line separately to keep the line breaks as tokens.
+    for line in lines:
+        line_tokens = word_tokenize(line.strip())
+        tokens.extend(line_tokens)
+        tokens.append("\n")
+    return tokens[:-1]  # Remove the last newline token
+
+
+def custom_word_detokenize(tokenized_text):
+    """Converts a list of tokens to a detokenized string.
+    Args:
+        tokenized_text (list): A list of tokens.
+        Returns:
+        str: A detokenized string.
+    """
+
+    prompt_text = " ".join(tokenized_text)
+    prompt_text = prompt_text.replace(" 's", "'s")
+    prompt_text = prompt_text.replace(" ( ", " (")
+    prompt_text = prompt_text.replace(" ) ", ") ")
+    prompt_text = prompt_text.replace(" , ", ", ")
+    prompt_text = prompt_text.replace(" . ", ". ")
+    prompt_text = prompt_text.replace(" .", ".")
+    prompt_text = prompt_text.replace(" : ", ": ")
+    prompt_text = prompt_text.replace(" ; ", "; ")
+    prompt_text = prompt_text.replace(" ! ", "! ")
+    prompt_text = prompt_text.replace(" ? ", "? ")
+    prompt_text = prompt_text.replace(" ?", "?")
+    prompt_text = prompt_text.replace(" !", "!")
+    prompt_text = prompt_text.replace(" % ", "% ")
+    prompt_text = prompt_text.replace(" n't", "n't")
+    prompt_text = prompt_text.replace("''", "\"")
+    prompt_text = prompt_text.replace("``", "\"")
+    prompt_text = prompt_text.replace(" 've", "'ve")
+    prompt_text = prompt_text.replace(" 'm", "'m")
+
+    return prompt_text
+
+# Below are classes that relates to the OpenAI API.
+
 
 class OpenaiLongParser:
     """This class is used to submit texts to the OpenAi API.
@@ -30,53 +103,18 @@ class OpenaiLongParser:
 
         self.longtext = longtext
         self.chunk_size = chunk_size
-        self.num_tokens = self.count_tokens([longtext])
-        self.break_up_longtext_to_chunks(self.longtext, self.chunk_size)
+        self.num_tokens = count_tokens([longtext])
+        self.break_up_longtext_to_chunks(self.longtext)
         self.num_chunks = len(self.chunks)
         self.max_concurrent_calls = max_concurrent_calls
 
         # We load the API key and send it to OpenAI library
         openai.api_key = os.getenv("OPENAI_API_KEY")
 
-    def count_tokens(self, texts):
-        """Counts the number of tokens in the long texts.
-        Args:
-            texts (list): A list of texts.
-        Returns:
-            int: The number of tokens.
-        """
-        encoding = tiktoken.encoding_for_model("gpt-3.5-turbo-0301")
-        num_tokens = 0
-
-        for message in texts:
-            # every message follows <im_start>{role/name}\n{content}<im_end>\n
-            num_tokens += 4
-            num_tokens += len(encoding.encode(message))
-
-        return num_tokens
-
-    def custom_word_tokenize(self, text):
-        """Tokenizes a string. Currently using a simpler version of the nltk
-        word_tokenize function.
-        Args:
-            text (str): The text to tokenize.
-        Returns:
-            list: A list of tokens.
-        """
-        lines = text.splitlines(True)
-        tokens = []
-        # We tokenize each line separately to keep the line breaks as tokens.
-        for line in lines:
-            line_tokens = word_tokenize(line.strip())
-            tokens.extend(line_tokens)
-            tokens.append("\n")
-        return tokens[:-1]  # Remove the last newline token
-
-    def break_up_tokens_in_chunks(self, tokens, chunk_size):
+    def break_up_tokens_in_chunks(self, tokens):
         """Breaks up a file into chunks of tokens.
         Args:
             tokens (list): A list of tokens.
-            chunk_size (int): The number of tokens in each chunk.
         Returns:
             list: A list of lists of tokens.
         """
@@ -92,53 +130,25 @@ class OpenaiLongParser:
                     break
             return current_length
 
-        if len(tokens) <= chunk_size:
+        if len(tokens) <= self.chunk_size:
             yield tokens
         else:
-            end_idx = find_sentence_boundary(tokens, chunk_size)
+            end_idx = find_sentence_boundary(tokens, self.chunk_size)
             chunk = tokens[:end_idx + 1]
             yield chunk
-            yield from self.break_up_tokens_in_chunks(tokens[end_idx + 1:],
-                                                      chunk_size)
+            yield from self.break_up_tokens_in_chunks(tokens[end_idx + 1:])
 
-    def convert_to_detokenized_text(self, tokenized_text):
-        """Converts a list of tokens to a detokenized string.
-        Args:
-            tokenized_text (list): A list of tokens.
-            Returns:
-            str: A detokenized string.
-        """
-
-        prompt_text = " ".join(tokenized_text)
-        prompt_text = prompt_text.replace(" 's", "'s")
-        prompt_text = prompt_text.replace(" ( ", " (")
-        prompt_text = prompt_text.replace(" ) ", ") ")
-        prompt_text = prompt_text.replace(" , ", ", ")
-        prompt_text = prompt_text.replace(" . ", ". ")
-        prompt_text = prompt_text.replace(" .", ".")
-        prompt_text = prompt_text.replace(" : ", ": ")
-        prompt_text = prompt_text.replace(" ; ", "; ")
-        prompt_text = prompt_text.replace(" ! ", "! ")
-        prompt_text = prompt_text.replace(" ? ", "? ")
-        prompt_text = prompt_text.replace(" ?", "?")
-        prompt_text = prompt_text.replace(" !", "!")
-        prompt_text = prompt_text.replace(" % ", "% ")
-
-        return prompt_text
-
-    def break_up_longtext_to_chunks(self, text, chunk_size):
+    def break_up_longtext_to_chunks(self, text):
         """Breaks up a file into chunks of tokens.
         Args:
             text (str): The text to break up.
-            chunk_size (int): The number of tokens in each chunk.
         Returns:
             list: A list of lists of tokens.
         """
-        tokens = self.custom_word_tokenize(text)
+        tokens = custom_word_tokenize(text)
         self.chunks = [
-            self.convert_to_detokenized_text(local_tokens)
-            for local_tokens in self.break_up_tokens_in_chunks(tokens,
-                                                               chunk_size)
+            custom_word_detokenize(local_tokens)
+            for local_tokens in self.break_up_tokens_in_chunks(tokens)
         ]
 
     async def _worker(self, queue):
@@ -148,7 +158,7 @@ class OpenaiLongParser:
              presence_penalty, frequency_penalty,
              result
              ) = await queue.get()
-            NbTokensInPrompt = self.count_tokens([prompt])
+            NbTokensInPrompt = count_tokens([prompt])
             logging.info("Calling OpenAI API on a chunk of text.")
             logging.info(f"Number of tokens in the prompt: {NbTokensInPrompt}")
 
@@ -163,7 +173,7 @@ class OpenaiLongParser:
                 frequency_penalty=frequency_penalty,
             )
 
-            NbTokensInResponse = self.count_tokens(
+            NbTokensInResponse = count_tokens(
                 [response['choices'][0]['message']['content']])
             logging.info(
                 f"Number of tokens in the response: {NbTokensInResponse}")
@@ -245,7 +255,7 @@ class OpenaiLongParser:
         logging.info("Calling the OpenAI API")
         # Nb of tokens in the prompt
 
-        NbTokensInPrompt = self.count_tokens([prompt])
+        NbTokensInPrompt = count_tokens([prompt])
 
         logging.info(f"Number of tokens in the text: {NbTokensInPrompt}")
 

@@ -20,8 +20,7 @@ def test_api_embedding_call():
 def test_api_chunk_embedding_call():
     test_str = 'Hello World! \
         Hello World!'
-    openai_long_parser = OpenaiLongParser(test_str)
-    openai_long_parser.break_up_longtext_to_chunks(test_str, chunk_size=3)
+    openai_long_parser = OpenaiLongParser(test_str, chunk_size=3)
     response = openai_long_parser.process_chunks_through_embedding()
     assert len(response) == 2
 
