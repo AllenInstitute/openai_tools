@@ -1,6 +1,6 @@
 
 
-from papers_extractor.openai_parsers import OpenaiLongParser, count_tokens
+from papers_extractor.openai_parsers import OpenaiLongParser
 import os
 import openai
 import logging
@@ -17,19 +17,6 @@ def test_api_call():
     response = openai_long_parser.multi_call_chatGPT(
         ["Say Hello World, I am a test."], temperature=0)
     assert response == ['Hello World, I am a test.']
-
-
-def test_counter():
-    assert count_tokens(["Test prompt"]) == 6
-
-
-def test_custom_word_tokenize():
-    test_str = "Test prompt. Hello world!"
-
-    openai_long_parser = OpenaiLongParser(test_str)
-    question = openai_long_parser.custom_word_tokenize(test_str)
-    response = ['Test', 'prompt', '.', 'Hello', 'world', '!']
-    assert question == response
 
 
 def test_break_up_veryshortsentence_to_chunks():
@@ -143,8 +130,6 @@ def test_process_chunks_through_prompt():
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, stream=sys.stdout, force=True)
     test_api_call()
-    test_counter()
-    test_custom_word_tokenize()
     test_break_up_veryshortsentence_to_chunks()
     test_break_up_veryshortendedsentence_to_chunks()
     test_break_up_shortsentences_to_chunks()

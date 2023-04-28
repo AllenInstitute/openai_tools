@@ -14,8 +14,6 @@ nltk.download("punkt")
 
 # Below are methods that can be called outside of the class and
 # therefore have a broader scope.
-
-
 def count_tokens(texts, model="gpt-3.5-turbo-0301"):
     """Counts the number of tokens in the long texts.
     Args:
@@ -34,7 +32,54 @@ def count_tokens(texts, model="gpt-3.5-turbo-0301"):
 
     return num_tokens
 
+def custom_word_tokenize(text):
+    """Tokenizes a string. Currently using a simpler version of the nltk
+    word_tokenize function.
+    Args:
+        text (str): The text to tokenize.
+    Returns:
+        list: A list of tokens.
+    """
+    lines = text.splitlines(True)
+    tokens = []
+    # We tokenize each line separately to keep the line breaks as tokens.
+    for line in lines:
+        line_tokens = word_tokenize(line.strip())
+        tokens.extend(line_tokens)
+        tokens.append("\n")
+    return tokens[:-1]  # Remove the last newline token
 
+def custom_word_detokenize(tokenized_text):
+    """Converts a list of tokens to a detokenized string.
+    Args:
+        tokenized_text (list): A list of tokens.
+        Returns:
+        str: A detokenized string.
+    """
+
+    prompt_text = " ".join(tokenized_text)
+    prompt_text = prompt_text.replace(" 's", "'s")
+    prompt_text = prompt_text.replace(" ( ", " (")
+    prompt_text = prompt_text.replace(" ) ", ") ")
+    prompt_text = prompt_text.replace(" , ", ", ")
+    prompt_text = prompt_text.replace(" . ", ". ")
+    prompt_text = prompt_text.replace(" .", ".")
+    prompt_text = prompt_text.replace(" : ", ": ")
+    prompt_text = prompt_text.replace(" ; ", "; ")
+    prompt_text = prompt_text.replace(" ! ", "! ")
+    prompt_text = prompt_text.replace(" ? ", "? ")
+    prompt_text = prompt_text.replace(" ?", "?")
+    prompt_text = prompt_text.replace(" !", "!")
+    prompt_text = prompt_text.replace(" % ", "% ")
+    prompt_text = prompt_text.replace(" n't", "n't")
+    prompt_text = prompt_text.replace("''", "\"")
+    prompt_text = prompt_text.replace("``", "\"")
+    prompt_text = prompt_text.replace(" 've", "'ve")
+    prompt_text = prompt_text.replace(" 'm", "'m")
+
+    return prompt_text
+    
+# Below are classes that relates to the OpenAI API.
 class OpenaiLongParser:
     """This class is used to submit texts to the OpenAi API.
     Some functions will enable processing a prompt in chunks to bypass the
@@ -60,23 +105,8 @@ class OpenaiLongParser:
         # We load the API key and send it to OpenAI library
         openai.api_key = os.getenv("OPENAI_API_KEY")
 
-    def custom_word_tokenize(self, text):
-        """Tokenizes a string. Currently using a simpler version of the nltk
-        word_tokenize function.
-        Args:
-            text (str): The text to tokenize.
-        Returns:
-            list: A list of tokens.
-        """
-        lines = text.splitlines(True)
-        tokens = []
-        # We tokenize each line separately to keep the line breaks as tokens.
-        for line in lines:
-            line_tokens = word_tokenize(line.strip())
-            tokens.extend(line_tokens)
-            tokens.append("\n")
-        return tokens[:-1]  # Remove the last newline token
 
+    
     def break_up_tokens_in_chunks(self, tokens):
         """Breaks up a file into chunks of tokens.
         Args:
@@ -104,30 +134,7 @@ class OpenaiLongParser:
             yield chunk
             yield from self.break_up_tokens_in_chunks(tokens[end_idx + 1:])
 
-    def convert_to_detokenized_text(self, tokenized_text):
-        """Converts a list of tokens to a detokenized string.
-        Args:
-            tokenized_text (list): A list of tokens.
-            Returns:
-            str: A detokenized string.
-        """
 
-        prompt_text = " ".join(tokenized_text)
-        prompt_text = prompt_text.replace(" 's", "'s")
-        prompt_text = prompt_text.replace(" ( ", " (")
-        prompt_text = prompt_text.replace(" ) ", ") ")
-        prompt_text = prompt_text.replace(" , ", ", ")
-        prompt_text = prompt_text.replace(" . ", ". ")
-        prompt_text = prompt_text.replace(" .", ".")
-        prompt_text = prompt_text.replace(" : ", ": ")
-        prompt_text = prompt_text.replace(" ; ", "; ")
-        prompt_text = prompt_text.replace(" ! ", "! ")
-        prompt_text = prompt_text.replace(" ? ", "? ")
-        prompt_text = prompt_text.replace(" ?", "?")
-        prompt_text = prompt_text.replace(" !", "!")
-        prompt_text = prompt_text.replace(" % ", "% ")
-
-        return prompt_text
 
     def break_up_longtext_to_chunks(self, text):
         """Breaks up a file into chunks of tokens.
@@ -136,9 +143,9 @@ class OpenaiLongParser:
         Returns:
             list: A list of lists of tokens.
         """
-        tokens = self.custom_word_tokenize(text)
+        tokens = custom_word_tokenize(text)
         self.chunks = [
-            self.convert_to_detokenized_text(local_tokens)
+            custom_word_detokenize(local_tokens)
             for local_tokens in self.break_up_tokens_in_chunks(tokens)
         ]
 
