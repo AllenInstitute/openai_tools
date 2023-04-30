@@ -7,7 +7,7 @@ import os
 import logging
 from papers_extractor.openai_parsers import OpenaiLongParser
 from diskcache import Cache
-
+from papers_extractor.database_parser import LocalDatabase
 
 class PdfParser:
     """This class is used to parse a PDF file and extract the text from it.
@@ -15,15 +15,15 @@ class PdfParser:
     irrelevant content.
     """
 
-    def __init__(self, pdf_path, cut_bibliography=True, use_database=True, 
+    def __init__(self, pdf_path, cut_bibliography=True, local_database=None, 
                  database_id='auto'):
         """Initializes the class with the path to the PDF file.
         Args:
             pdf_path (str): The path to the PDF file.
             cut_bibliography (bool): Whether to cut the bibliography from the
             text or not. Defaults to True.
-            use_database (bool): Whether to use the database or not.
-            Defaults to True.
+            local_database (LocalDatabase): The local database to use. If set
+            to None, no database will be used. Defaults to None.
             database_id (str): The key to use for the database. If set to auto,
             it will be generated from the pdf_path. Defaults to auto.
         Returns:
@@ -34,14 +34,13 @@ class PdfParser:
         self.raw_text = None
         self.cleaned_text = None
         self.cut_bibliography = cut_bibliography
-        self.use_database = use_database
+        self.database = local_database
         self.database_id = database_id
         self.load_raw_text()
 
         # We load from the database if requested
         # This will overwrite the raw text if it exists
-        if self.use_database:
-            self.database = Cache(default_ttl=None)
+        if self.database is not None:
 
             # The key in the database is created from the pdf_path
             if database_id == 'auto':
@@ -52,14 +51,7 @@ class PdfParser:
                          .format(self.database_id))
             
             # We load the database if it exists
-            if self.database_id in self.database:
-                database_content = self.database[self.database_id]
-                if 'cleaned_text' in database_content:
-                    self.cleaned_text = database_content['cleaned_text']
-                    logging.info("cleaned text database loaded for pdf")
-                if 'raw_text' in database_content:
-                    self.raw_text = database_content['raw_text']
-                    logging.info("raw text database loaded for pdf")
+            self.database.load_class_from_database(self.database_id, self)
    
     def load_raw_text(self):
         """Loads the raw text from the PDF file."""
@@ -71,13 +63,10 @@ class PdfParser:
 
     def save_database(self):
         """Saves the pdf data to the database if available."""
-        if self.use_database:
-            logging.info("Saving database for pdf file")
-            self.database[self.database_id] = {
-                'cleaned_text': self.cleaned_text,
-                'raw_text': self.raw_text
-            }
-            self.database.touch(self.database_id, expire=None)
+        """Saves the database for the long paper if available."""
+        if self.database is not None:
+            logging.info("Saving database for long paper")
+            self.database.save_class_to_database(self.database_id, self)
 
     def remove_bibliography(self, input_text):
         """We remove the bibliography from the text."""

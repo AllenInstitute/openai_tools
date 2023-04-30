@@ -3,34 +3,22 @@
 # of the paper using various deep learning models.
 import logging
 from papers_extractor.openai_parsers import OpenaiLongParser
-from diskcache import Cache
-import hashlib
+from papers_extractor.database_parser import hash_variable
 
-# This function hashes a variable to use it as a key for the database
-def hash_variable(var):
-    """This function hashes a variable to use it as a key for the database.
-    Args:
-        var (str): The variable to hash.
-    Returns:
-        hashed_var (str): The hashed variable.
-    """
-
-    hashed_var = hashlib.sha1(str(var).encode()).hexdigest()
-    return hashed_var
 
 class LongPaper:
     """This class is used to summarize the text contained in a long paper.
     It will be processed in chunks of a given size."""
 
-    def __init__(self, longtext, chunk_size=1400,  use_database=True, 
+    def __init__(self, longtext, chunk_size=1400,  local_database=None, 
                  database_id='auto'):
         """Initializes the class with the long text.
         Args:
             longtext (str): The long text to summarize.
             chunk_size (int): The size of the chunks in tokens to use for the
             chunks. Defaults to 1400.
-            use_database (bool): Whether to use the database or not. 
-            Defaults to True.
+            local_database (LocalDatabase): The local database to use. 
+            If set to None, no database will be used. Defaults to None.
             database_id (str): The key to use for the database. If set to auto, 
             it will be generated from the long text and the chunk size.  
             We recommend using the DOI of the paper. Defaults
@@ -40,13 +28,11 @@ class LongPaper:
         """
         self.longtext = longtext
         self.chunk_size = chunk_size
-        self.use_database = use_database
+        self.database = local_database
         self.summary = None
         self.embedding = None
 
-        if self.use_database:
-            self.database = Cache(default_ttl=None)
-
+        if self.database is not None:
             # The key in the database is created from the long text and the chunk
             # size unless provided to the class
             if database_id == 'auto':
@@ -57,37 +43,19 @@ class LongPaper:
             logging.info("Database key for long paper: {}"
                          .format(self.database_id))
 
-            # We load the database if it exists
-            if self.database_id in self.database:
-                database_content = self.database[self.database_id]
-                if 'summary' in database_content:
-                    self.summary = database_content['summary']
-                    logging.info("Summary database loaded for long paper")
-                if 'embedding' in database_content:
-                    self.embedding = database_content['embedding']
-                    logging.info("Embedding database loaded for long paper")
-   
-    def __del__(self):
-        if self.use_database:
-            logging.info("Closing database for long paper")
-            self.database.close()
+            self.database.load_class_from_database(self.database_id, self)
     
     def reset_database(self):
         """Resets the database for the long paper if available."""
-        if self.use_database:
+        if self.database is not None:
             logging.info("Resetting database for long paper")
-            if self.database_id in self.database:
-                del self.database[self.database_id]
+            self.database.reset_key(self.database_id)
 
     def save_database(self):
         """Saves the database for the long paper if available."""
-        if self.use_database:
+        if self.database is not None:
             logging.info("Saving database for long paper")
-            self.database[self.database_id] = {
-                'summary': self.summary,
-                'embedding': self.embedding
-            }
-            self.database.touch(self.database_id, expire=None)
+            self.database.save_class_to_database(self.database_id, self)
 
     def calculate_embedding(self, parser="GPT"):
         """This function extracts semantic embeddings in chunks
