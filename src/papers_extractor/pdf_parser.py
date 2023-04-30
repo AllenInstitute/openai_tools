@@ -6,8 +6,7 @@ from pdfminer.layout import LAParams
 import os
 import logging
 from papers_extractor.openai_parsers import OpenaiLongParser
-from diskcache import Cache
-from papers_extractor.database_parser import LocalDatabase
+
 
 class PdfParser:
     """This class is used to parse a PDF file and extract the text from it.
@@ -15,7 +14,7 @@ class PdfParser:
     irrelevant content.
     """
 
-    def __init__(self, pdf_path, cut_bibliography=True, local_database=None, 
+    def __init__(self, pdf_path, cut_bibliography=True, local_database=None,
                  database_id='auto'):
         """Initializes the class with the path to the PDF file.
         Args:
@@ -27,7 +26,7 @@ class PdfParser:
             database_id (str): The key to use for the database. If set to auto,
             it will be generated from the pdf_path. Defaults to auto.
         Returns:
-            None    
+            None
         """
 
         self.pdf_path = pdf_path
@@ -49,10 +48,10 @@ class PdfParser:
                 self.database_id = database_id
             logging.info("Database key for pdf file: {}"
                          .format(self.database_id))
-            
+
             # We load the database if it exists
             self.database.load_class_from_database(self.database_id, self)
-   
+
     def load_raw_text(self):
         """Loads the raw text from the PDF file."""
 
@@ -63,7 +62,6 @@ class PdfParser:
 
     def save_database(self):
         """Saves the pdf data to the database if available."""
-        """Saves the database for the long paper if available."""
         if self.database is not None:
             logging.info("Saving database for long paper")
             self.database.save_class_to_database(self.database_id, self)
@@ -95,12 +93,12 @@ class PdfParser:
                 text_cleaned = self.remove_bibliography(self.raw_text)
 
             logging.info("Cleaning up and compressing the text")
-            openai_prompt = "Clean up formatting, Remove author list, \
-                Remove references & bibliography, Remove page number, \
-                Remove headers and Remove footers from the following \
-                text from a scientific publication. Don't change any \
-                other words:"
-            
+            openai_prompt = "Clean up formatting, Remove author list, " + \
+                "Remove references & bibliography, Remove page number, " + \
+                "Remove headers and Remove footers from the following " + \
+                "text from a scientific publication. Don't change any " + \
+                "other words:"
+
             AIParser = OpenaiLongParser(text_cleaned, chunk_size=1400)
 
             if chunks_path is not None:

@@ -72,8 +72,10 @@ if __name__ == "__main__":
     database_path = args.database_path
 
     # We load the pdf parser to extract and clean the content
-    pdf_parser = PdfParser(pdf_path, cut_bibliography=args.cut_bibliography
-                           , local_database=database_path)
+    pdf_parser = PdfParser(
+        pdf_path,
+        cut_bibliography=args.cut_bibliography,
+        local_database=database_path)
     cleaned_text = pdf_parser.get_clean_text()
 
     # We then use the long paper parser to summarize the content

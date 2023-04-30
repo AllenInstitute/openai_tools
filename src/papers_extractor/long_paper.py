@@ -10,17 +10,17 @@ class LongPaper:
     """This class is used to summarize the text contained in a long paper.
     It will be processed in chunks of a given size."""
 
-    def __init__(self, longtext, chunk_size=1400, local_database=None, 
+    def __init__(self, longtext, chunk_size=1400, local_database=None,
                  database_id='auto'):
         """Initializes the class with the long text.
         Args:
             longtext (str): The long text to summarize.
             chunk_size (int): The size of the chunks in tokens to use for the
             chunks. Defaults to 1400.
-            local_database (LocalDatabase): The local database to use. 
+            local_database (LocalDatabase): The local database to use.
             If set to None, no database will be used. Defaults to None.
-            database_id (str): The key to use for the database. If set to auto, 
-            it will be generated from the long text and the chunk size.  
+            database_id (str): The key to use for the database. If set to auto,
+            it will be generated from the long text and the chunk size.
             We recommend using the DOI of the paper. Defaults
             to auto.
         Returns:
@@ -34,8 +34,8 @@ class LongPaper:
         self.database_id = database_id
 
         if self.database is not None:
-            # The key in the database is created from the long text and the chunk
-            # size unless provided to the class
+            # The key in the database is created from the long text and
+            # the chunk size unless provided to the class
             if database_id == 'auto':
                 self.database_id = hash_variable(self.longtext) + \
                     hash_variable(self.chunk_size)
@@ -45,7 +45,7 @@ class LongPaper:
                          .format(self.database_id))
 
             self.database.load_class_from_database(self.database_id, self)
-    
+
     def reset_database(self):
         """Resets the database for the long paper if available."""
         if self.database is not None:
@@ -76,7 +76,8 @@ class LongPaper:
             if parser == "GPT":
                 local_openai = OpenaiLongParser(self.longtext,
                                                 chunk_size=self.chunk_size)
-                self.embedding = local_openai.process_chunks_through_embedding()
+                self.embedding = \
+                    local_openai.process_chunks_through_embedding()
                 self.save_database()
                 return self.embedding
             else:
@@ -99,10 +100,10 @@ class LongPaper:
             final_text (list): A list of the summary for each chunk.
         """
 
-        openai_prompt = "Write a long, very detailed summary for a \
-                technical expert of the following paragraph, from a paper, \
-                    refering to the text as -This publication-:"
-        
+        openai_prompt = "Write a long, very detailed summary for a " + \
+            "technical expert of the following paragraph, from" + \
+            " a paper, refering to the text as -This publication-:"
+
         # We check if the summary is already available
         if self.summary is None:
             current_text = self.longtext
@@ -138,8 +139,9 @@ class LongPaper:
             if final_long.num_chunks == 1:
                 logging.info("Cleaning up the summary")
 
-                prompt = "Can you clean up this publication summary to make it \
-                    flow logically. Keep this summary very technical and detailed:"
+                prompt = "Can you clean up this publication summary to " + \
+                    "make it flow logically. Keep this summary very " + \
+                    "technical and detailed:"
                 final_text = final_long.process_chunks_through_prompt(
                     prompt, temperature=0, presence_penalty=-0.5
                 )
