@@ -127,7 +127,6 @@ def test_process_chunks_through_prompt():
     prompt = "Say"
     reply = openai_long_parser.process_chunks_through_prompt(prompt,
                                                              temperature=0)
-    print(reply)
     response = ['Hello World!',
                 'Hello World!']
     assert reply == response

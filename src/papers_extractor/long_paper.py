@@ -54,7 +54,8 @@ class LongPaper:
                     hash_variable(self.chunk_size)
             else:
                 self.database_id = database_id
-            logging.info("Database key for long paper: {}".format(self.database_id))
+            logging.info("Database key for long paper: {}"
+                         .format(self.database_id))
 
             # We load the database if it exists
             if self.database_id in self.database:

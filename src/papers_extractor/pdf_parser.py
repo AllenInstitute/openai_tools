@@ -6,6 +6,7 @@ from pdfminer.layout import LAParams
 import os
 import logging
 from papers_extractor.openai_parsers import OpenaiLongParser
+from diskcache import Cache
 
 
 class PdfParser:
@@ -14,15 +15,52 @@ class PdfParser:
     irrelevant content.
     """
 
-    def __init__(self, pdf_path, cut_bibliography=True):
-        """Initializes the class with the path to the PDF file."""
+    def __init__(self, pdf_path, cut_bibliography=True, use_database=True, 
+                 database_id='auto'):
+        """Initializes the class with the path to the PDF file.
+        Args:
+            pdf_path (str): The path to the PDF file.
+            cut_bibliography (bool): Whether to cut the bibliography from the
+            text or not. Defaults to True.
+            use_database (bool): Whether to use the database or not.
+            Defaults to True.
+            database_id (str): The key to use for the database. If set to auto,
+            it will be generated from the pdf_path. Defaults to auto.
+        Returns:
+            None    
+        """
+
         self.pdf_path = pdf_path
         self.raw_text = None
         self.cleaned_text = None
         self.cut_bibliography = cut_bibliography
+        self.use_database = use_database
+        self.database_id = database_id
+        self.load_raw_text()
 
-        self.load_saved_texts()
+        # We load from the database if requested
+        # This will overwrite the raw text if it exists
+        if self.use_database:
+            self.database = Cache(default_ttl=None)
 
+            # The key in the database is created from the pdf_path
+            if database_id == 'auto':
+                self.database_id = pdf_path
+            else:
+                self.database_id = database_id
+            logging.info("Database key for pdf file: {}"
+                         .format(self.database_id))
+            
+            # We load the database if it exists
+            if self.database_id in self.database:
+                database_content = self.database[self.database_id]
+                if 'cleaned_text' in database_content:
+                    self.cleaned_text = database_content['cleaned_text']
+                    logging.info("cleaned text database loaded for pdf")
+                if 'raw_text' in database_content:
+                    self.raw_text = database_content['raw_text']
+                    logging.info("raw text database loaded for pdf")
+   
     def load_raw_text(self):
         """Loads the raw text from the PDF file."""
 
@@ -31,44 +69,15 @@ class PdfParser:
         text = extract_text(self.pdf_path, laparams=laparams)
         self.raw_text = text
 
-    def get_raw_text_path(self):
-        """Returns the path to the raw text file."""
-
-        return self.pdf_path.replace(".pdf", "_raw.txt")
-
-    def get_cleaned_text_path(self):
-        """Returns the path to the cleaned text file."""
-
-        return self.pdf_path.replace(".pdf", "_cleaned.txt")
-
-    def save_raw_text(self):
-        """We save the raw text in a txt file."""
-        raw_text_path = self.get_raw_text_path()
-        with open(raw_text_path, "w") as f:
-            f.write(self.raw_text)
-
-    def save_cleaned_text(self):
-        """We save the cleaned text in a txt file."""
-
-        cleaned_text_path = self.get_cleaned_text_path()
-        with open(cleaned_text_path, "w") as f:
-            f.write(self.cleaned_text)
-
-    def load_saved_texts(self):
-        """We check if we have already saved the raw text and cleaned text.
-        If we have, we load them. If not, we load the raw text and save it.
-        """
-        raw_text_path = self.get_raw_text_path()
-        cleaned_text_path = self.get_cleaned_text_path()
-        if os.path.exists(cleaned_text_path):
-            with open(cleaned_text_path, "r") as f:
-                self.cleaned_text = f.read()
-        if os.path.exists(raw_text_path):
-            with open(raw_text_path, "r") as f:
-                self.raw_text = f.read()
-        else:
-            self.load_raw_text()
-            self.save_raw_text()
+    def save_database(self):
+        """Saves the pdf data to the database if available."""
+        if self.use_database:
+            logging.info("Saving database for pdf file")
+            self.database[self.database_id] = {
+                'cleaned_text': self.cleaned_text,
+                'raw_text': self.raw_text
+            }
+            self.database.touch(self.database_id, expire=None)
 
     def remove_bibliography(self, input_text):
         """We remove the bibliography from the text."""
@@ -81,9 +90,14 @@ class PdfParser:
 
         return updated_text
 
-    def get_clean_text(self):
-        """We clean up the text and remove formatting and \
-            irrelevant content."""
+    def get_clean_text(self, chunks_path=None):
+        """Extracts the text from the PDF file and cleans it up.
+        Args:
+            chunks_path (str): The path to the folder where the chunks are
+            saved. Defaults to None. Used only for debugging.
+        Returns:
+            str: The cleaned up text.
+        """
 
         if self.cleaned_text:
             return self.cleaned_text
@@ -97,22 +111,19 @@ class PdfParser:
                 Remove headers and Remove footers from the following \
                 text from a scientific publication. Don't change any \
                 other words:"
-
+            
             AIParser = OpenaiLongParser(text_cleaned, chunk_size=1400)
 
-            # We make a folder for the chunks if it doesn't exist
-            base_folder = os.path.dirname(self.pdf_path)
-            chunks_folder = os.path.join(
-                base_folder, os.path.basename(self.pdf_path).split(".pdf")[0]
-            )
-            if not os.path.exists(chunks_folder):
-                os.mkdir(chunks_folder)
+            if chunks_path is not None:
+                if not os.path.exists(chunks_path):
+                    os.mkdir(chunks_path)
 
             all_chunks = AIParser.process_chunks_through_prompt(
-                openai_prompt, save_path=chunks_folder
+                openai_prompt, save_path=chunks_path
             )
+
             self.cleaned_text = "\n".join(all_chunks)
 
-            self.save_cleaned_text()
+            self.save_database()
 
             return self.cleaned_text
