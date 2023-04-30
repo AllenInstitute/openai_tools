@@ -10,7 +10,7 @@ class LongPaper:
     """This class is used to summarize the text contained in a long paper.
     It will be processed in chunks of a given size."""
 
-    def __init__(self, longtext, chunk_size=1400,  local_database=None, 
+    def __init__(self, longtext, chunk_size=1400, local_database=None, 
                  database_id='auto'):
         """Initializes the class with the long text.
         Args:
@@ -31,6 +31,7 @@ class LongPaper:
         self.database = local_database
         self.summary = None
         self.embedding = None
+        self.database_id = database_id
 
         if self.database is not None:
             # The key in the database is created from the long text and the chunk
@@ -52,9 +53,9 @@ class LongPaper:
             self.database.reset_key(self.database_id)
 
     def save_database(self):
-        """Saves the database for the long paper if available."""
+        """Saves the long paper to the database if available."""
         if self.database is not None:
-            logging.info("Saving database for long paper")
+            logging.info("Saving long paper to database")
             self.database.save_class_to_database(self.database_id, self)
 
     def calculate_embedding(self, parser="GPT"):

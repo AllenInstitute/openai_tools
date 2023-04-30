@@ -61,11 +61,14 @@ class LocalDatabase:
         Returns:
             class_to_load (object): The class loaded from the database.
         """    
-        logging.info("Loading class from database")
-        for dict_key in self.database[key]:
-            logging.info("Loading {} from database".format(dict_key))
-            class_to_load.__dict__[dict_key] = self.database[key][dict_key]
-    
+        if self.check_in_database(key) is False:
+            logging.info("Key {} not in database".format(key))
+        else:
+            logging.info("Loading class from database")
+            for dict_key in self.database[key]:
+                logging.info("Loading {} from database".format(dict_key))
+                class_to_load.__dict__[dict_key] = self.database[key][dict_key]
+        
     def check_in_database(self, key):
         """Checks if a key is in the database.
         Args:

@@ -52,18 +52,32 @@ if __name__ == "__main__":
         type=int,
         default=1,
     )
+
+    parser.add_argument(
+        "--database_path",
+        help="Path to the database file. This is an optional argument. \
+            If path is not provided, no database will be used or created. \
+            If the path is provided, the database will be created if it \
+            does not exist. If it exists, it will be loaded and used. \
+            Use this to grow your database of papers.",
+        type=str,
+        default=None,
+    )
+
     args = parser.parse_args()
 
     pdf_path = args.path_pdf
     save_summary = args.save_summary
     chunk_length = args.chunk_length
+    database_path = args.database_path
 
     # We load the pdf parser to extract and clean the content
-    pdf_parser = PdfParser(pdf_path, cut_bibliography=args.cut_bibliography)
+    pdf_parser = PdfParser(pdf_path, cut_bibliography=args.cut_bibliography
+                           , local_database=database_path)
     cleaned_text = pdf_parser.get_clean_text()
 
     # We then use the long paper parser to summarize the content
-    paper_parser = LongPaper(cleaned_text)
+    paper_parser = LongPaper(cleaned_text, local_database=database_path)
 
     # We save the summary in a txt file
     if save_summary:
