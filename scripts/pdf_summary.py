@@ -4,6 +4,8 @@ import argparse
 # Import the modules from the papers_extractor package
 from papers_extractor.pdf_parser import PdfParser
 from papers_extractor.long_paper import LongPaper
+from papers_extractor.database_parser import LocalDatabase
+
 import logging
 
 # Import the dotenv module to load the environment variables
@@ -70,16 +72,21 @@ if __name__ == "__main__":
     save_summary = args.save_summary
     chunk_length = args.chunk_length
     database_path = args.database_path
+    
+    if database_path is not None:
+        database_obj = LocalDatabase(database_path=database_path)
+    else:
+        database_obj = None
 
     # We load the pdf parser to extract and clean the content
     pdf_parser = PdfParser(
         pdf_path,
         cut_bibliography=args.cut_bibliography,
-        local_database=database_path)
+        local_database=database_obj)
     cleaned_text = pdf_parser.get_clean_text()
 
     # We then use the long paper parser to summarize the content
-    paper_parser = LongPaper(cleaned_text, local_database=database_path)
+    paper_parser = LongPaper(cleaned_text, local_database=database_obj)
 
     # We save the summary in a txt file
     if save_summary:
