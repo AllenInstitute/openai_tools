@@ -8,3 +8,4 @@ wget==3.2
 nltk
 habanero
 bs4
+diskcache

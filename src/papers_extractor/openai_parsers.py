@@ -280,7 +280,8 @@ class OpenaiLongParser:
         """Processes all the chunks through the API with a given prompt.
         Args:
             prompt (str): The prompt to use for the API call.
-            save_path (str): The path to save the chunks to.
+            save_path (str): The path to save the chunks to. This is useful
+            for debugging.
         Returns:
             str: The generated text.
         """

@@ -6,6 +6,12 @@ import openai
 import logging
 import sys
 
+# Import the dotenv module to load the environment variables
+from dotenv import load_dotenv
+
+# Load the environment variables from the .env file
+load_dotenv()
+
 # Replace with your own OpenAI API key or set the OPENAI_API_KEY
 openai.api_key = os.environ["OPENAI_API_KEY"]
 
