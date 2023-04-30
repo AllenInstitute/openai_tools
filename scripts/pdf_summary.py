@@ -72,7 +72,7 @@ if __name__ == "__main__":
     save_summary = args.save_summary
     chunk_length = args.chunk_length
     database_path = args.database_path
-    
+
     if database_path is not None:
         database_obj = LocalDatabase(database_path=database_path)
     else:
