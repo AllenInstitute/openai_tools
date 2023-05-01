@@ -6,6 +6,7 @@ from pdfminer.layout import LAParams
 import os
 import logging
 from papers_extractor.openai_parsers import OpenaiLongParser
+from papers_extractor.database_parser import hash_file
 
 
 class PdfParser:
@@ -43,7 +44,10 @@ class PdfParser:
 
             # The key in the database is created from the pdf_path
             if database_id == 'auto':
-                self.database_id = pdf_path
+                # We hash the file to get a unique key 
+                # that is indendent of the path
+                logging.info("Hashing the pdf file to get a unique key")
+                self.database_id = hash_file(pdf_path)
             else:
                 self.database_id = database_id
             logging.info("Database key for pdf file: {}"
