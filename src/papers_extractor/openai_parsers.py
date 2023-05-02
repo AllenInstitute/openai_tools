@@ -349,4 +349,4 @@ class OpenaiLongParser:
 
             processed_chunks.append(result)
 
-        return processed_chunks
+        return processed_chunks, list_chunk
