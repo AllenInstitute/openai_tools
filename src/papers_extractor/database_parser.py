@@ -20,6 +20,7 @@ def hash_variable(var):
     hashed_var = hashlib.sha1(str(var).encode()).hexdigest()
     return hashed_var
 
+
 def hash_file(file_path, algorithm='sha256'):
     """Return the hash of a file using the specified algorithm."""
     hasher = hashlib.new(algorithm)

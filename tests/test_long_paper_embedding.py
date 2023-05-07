@@ -14,6 +14,7 @@ load_dotenv()
 # Replace with your own OpenAI API key or set the OPENAI_API_KEY
 openai.api_key = os.environ["OPENAI_API_KEY"]
 
+
 def test_tsne_plot_longpaper():
     # This is mostly a smoke test to see if the plot is generated
     list_sentences_to_test = [
@@ -23,10 +24,11 @@ def test_tsne_plot_longpaper():
             We are reminded of the enormity of existence. \
             Our humble place within it.",
     ]
-    list_sentences_to_test = "\n".join(list_sentences_to_test) 
+    list_sentences_to_test = "\n".join(list_sentences_to_test)
     long_paper = LongPaper(list_sentences_to_test, chunk_size=10)
     figure_handle = long_paper.plot_tsne_embedding(perplexity=3)
     assert figure_handle is not None
+
 
 def test_average_embedding():
     list_sentences_to_test = \
@@ -34,7 +36,8 @@ def test_average_embedding():
 
     long_paper = LongPaper(list_sentences_to_test, chunk_size=3)
     average_embedding = long_paper.get_average_embedding()
-    assert len(average_embedding)==1536
+    assert len(average_embedding) == 1536
+
 
 def test_calculate_embedding():
     list_sentences_to_test = \
@@ -43,7 +46,8 @@ def test_calculate_embedding():
     long_paper = LongPaper(list_sentences_to_test, chunk_size=3)
     long_paper.calculate_embedding()
 
-    assert np.array(long_paper.embedding).shape==(4, 1536)
+    assert np.array(long_paper.embedding).shape == (4, 1536)
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, stream=sys.stdout, force=True)

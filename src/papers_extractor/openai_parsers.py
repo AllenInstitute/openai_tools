@@ -129,18 +129,6 @@ class OpenaiLongParser:
                     break
             return current_length
 
-
-        def find_sentence_boundary(tokens, start_idx):
-            # This is to only cut at the end of the last full sentence.
-            current_length = start_idx
-
-            # We go backward until we find a sentence boundary.
-            for idx, token in enumerate(tokens[start_idx::-1]):
-                if token in {".", "!", "?"}:
-                    current_length = start_idx - idx
-                    break
-            return current_length
-
         if len(tokens) <= self.chunk_size:
             yield tokens
         else:
@@ -162,14 +150,15 @@ class OpenaiLongParser:
             for local_tokens in self.break_up_tokens_in_chunks(tokens)
         ]
 
-    async def _worker(self, queue, timeout, max_retries, abort_event, finished_tasks):
+    async def _worker(self, queue, timeout, max_retries, abort_event,
+                      finished_tasks):
         """An asynchronous worker that sends the requests to the API."""
         while not abort_event.is_set():
             try:
                 (prompt, temperature,
-                presence_penalty, frequency_penalty,
-                result
-                ) =  await asyncio.wait_for(queue.get(), timeout=10)
+                 presence_penalty, frequency_penalty,
+                 result
+                 ) = await asyncio.wait_for(queue.get(), timeout=10)
             except asyncio.TimeoutError:
                 continue
             NbTokensInPrompt = count_tokens([prompt])
@@ -189,32 +178,38 @@ class OpenaiLongParser:
                             presence_penalty=presence_penalty,
                             frequency_penalty=frequency_penalty,
                         ),
-                        timeout=timeout+retry*timeout/2,
+                        timeout=timeout + retry * timeout / 2,
                     )
-                    logging.info(f"API call succeeded with {NbTokensInPrompt} input tokens.")
+                    logging.info(
+                        f"API call succeeded with {NbTokensInPrompt} \
+                            input tokens.")
                     break
                 except asyncio.TimeoutError as e:
                     if retry == max_retries:
-                        logging.error(f"API call timed out after {max_retries} retries.")
-                        result.append(e)                     
+                        logging.error(
+                            f"API call timed out after {max_retries} retries.")
+                        result.append(e)
                         abort_event.set()
                         queue.task_done()
                     else:
-                        logging.warning(f"API call timed out with {NbTokensInPrompt} input tokens, retrying... (attempt {retry + 1})")
+                        logging.warning(
+                            f"API call timed out with {NbTokensInPrompt} \
+                                input tokens, retrying... \
+                                    (attempt {retry + 1})")
                         continue
                 except Exception as e:
                     logging.error(f"API call failed with error: {e}")
-                    result.append(e)                    
+                    result.append(e)
                     abort_event.set()
                     queue.task_done()
-            try: 
+            try:
                 NbTokensInResponse = count_tokens(
                     [response['choices'][0]['message']['content']])
-            except Exception as e:
-                logging.error(f"API call failed")
+            except Exception:
+                logging.error("API call failed")
                 result.append(Exception(
-                        "API call failed"
-                    ))                    
+                    "API call failed"
+                ))
                 abort_event.set()
                 queue.task_done()
             logging.info(
@@ -225,42 +220,53 @@ class OpenaiLongParser:
 
             # We error out if the response was stopped before the end.
             if response.choices[0].finish_reason == "length":
-                logging.error("We stopped because we reached the end of the LLM text.")
+                logging.error(
+                    "We stopped because we reached the end of the LLM text.")
                 result.append(Exception(
-                        "We stopped because we didn't reach \
+                    "We stopped because we didn't reach \
                             the end of the LLM text."
-                    ))        
+                ))
                 abort_event.set()
                 queue.task_done()
 
-            elapsed_time = time.perf_counter() - start_time  # Calculate the elapsed time
+            elapsed_time = time.perf_counter() - start_time
             result.append(response.choices[0]['message']['content'])
             queue.task_done()
             finished_tasks.release()
-            logging.info(f"Task done for attempt number {retry+1} in {elapsed_time:0.2f} seconds.")
+            logging.info(
+                f"Task done for attempt number {retry+1} \
+                    in {elapsed_time:0.2f} seconds.")
 
-    async def async_call_chatGPT(self, prompts, temperature, presence_penalty, frequency_penalty, timeout=140, max_retries=3):
+    async def async_call_chatGPT(self, prompts, temperature, presence_penalty,
+                                 frequency_penalty,
+                                 timeout=140,
+                                 max_retries=3):
         """Low-level async function that calls chatGPT in parallel."""
         queue = asyncio.Queue()
         abort_event = asyncio.Event()
         finished_tasks = asyncio.Semaphore(0)
-        
+
         workers = [
             asyncio.create_task(
-                self._worker(queue, timeout, max_retries, abort_event, finished_tasks)) for _ in range(self.max_concurrent_calls)
-        ]
+                self._worker(
+                    queue,
+                    timeout,
+                    max_retries,
+                    abort_event,
+                    finished_tasks)) for _ in range(
+                self.max_concurrent_calls)]
 
         results = [list() for _ in range(len(prompts))]
         for idx, prompt in enumerate(prompts):
             queue.put_nowait(
                 (prompt,
-                temperature,
-                presence_penalty,
-                frequency_penalty,
-                results[idx]))
+                 temperature,
+                 presence_penalty,
+                 frequency_penalty,
+                 results[idx]))
 
-        while finished_tasks._value != len(prompts): 
-            if abort_event.is_set():  # Check if the abort_event is set while waiting for the queue to join
+        while finished_tasks._value != len(prompts):
+            if abort_event.is_set():
                 logging.error("One Task was aborted. Aborting all tasks.")
                 break
             await asyncio.sleep(1)  # Sleep for a short interval
@@ -272,9 +278,11 @@ class OpenaiLongParser:
             if len(result_item) == 0:  # Check if the result is empty
                 logging.error(f"Aborting due to failed task {result_index}")
                 raise Exception("Aborting due to a failed task")
-            elif isinstance(result_item[0], BaseException):  # Check if the result contains an exception
+            # Check if the result contains an exception
+            elif isinstance(result_item[0], BaseException):
                 logging.error(f"Aborting due to failed task {result_index}")
-                raise result_item[0]  # Raise the exception to abort the program
+                # Raise the exception to abort the program
+                raise result_item[0]
 
         return [x[0] for x in results]
 

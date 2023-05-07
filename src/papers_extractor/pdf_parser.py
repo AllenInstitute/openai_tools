@@ -44,7 +44,7 @@ class PdfParser:
 
             # The key in the database is created from the pdf_path
             if database_id == 'auto':
-                # We hash the file to get a unique key 
+                # We hash the file to get a unique key
                 # that is indendent of the path
                 logging.info("Hashing the pdf file to get a unique key")
                 self.database_id = hash_file(pdf_path)
@@ -69,7 +69,7 @@ class PdfParser:
         for index, line in enumerate(array_text):
             if len(line) == 1:
                 array_text[index] = ""
-        
+
         text = "\n".join(array_text)
 
         self.raw_text = text

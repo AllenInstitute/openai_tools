@@ -8,6 +8,7 @@ from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 class LongPaper:
     """This class is used to summarize the text contained in a long paper.
     It will be processed in chunks of a given size."""
@@ -66,8 +67,8 @@ class LongPaper:
             logging.info("Embedding not available, calculating it")
             self.calculate_embedding()
         return np.mean(self.embedding, axis=0)
-    
-    def plot_tsne_embedding(self, save_figure_path = None, 
+
+    def plot_tsne_embedding(self, save_figure_path=None,
                             perplexity=5, random_state=42):
         """This function plots the t-SNE embeddings of the long paper.
         Args:
@@ -84,34 +85,34 @@ class LongPaper:
         if self.embedding is None:
             logging.info("Embedding not available, calculating it")
             self.calculate_embedding()
-        
+
         matrix = np.array(self.embedding)
 
         # Create a t-SNE model and transform the data
-        tsne = TSNE(n_components=2, 
-                    perplexity=perplexity, 
-                    random_state=random_state, 
-                    init='random', 
+        tsne = TSNE(n_components=2,
+                    perplexity=perplexity,
+                    random_state=random_state,
+                    init='random',
                     learning_rate=200)
         logging.info("Fitting t-SNE")
         vis_dims = tsne.fit_transform(matrix)
 
-        x = [x for x,y in vis_dims]
-        y = [y for x,y in vis_dims]
+        x = [x for x, y in vis_dims]
+        y = [y for x, y in vis_dims]
 
         fig = plt.figure(figsize=(10, 10))
         plt.scatter(x, y)
         # Add text next to each dot
 
         for i, text in enumerate(self.chunks):
-            plt.text(x[i]+1, y[i]+1, text, fontsize=7)
-            
+            plt.text(x[i] + 1, y[i] + 1, text, fontsize=7)
+
         plt.title("t-SNE of the embeddings")
         if save_figure_path is not None:
             plt.savefig(save_figure_path)
 
         return fig
-    
+
     def calculate_embedding(self, parser="GPT"):
         """This function extracts semantic embeddings in chunks
         from the long text.
