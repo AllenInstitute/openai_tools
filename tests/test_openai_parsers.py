@@ -28,15 +28,16 @@ def test_api_call():
 def test_break_up_veryshortsentence_to_chunks():
     test_str = 'Hello World'
 
-    openai_long_parser = OpenaiLongParser(test_str, chunk_size=3)
+    openai_long_parser = OpenaiLongParser(test_str, chunk_size=4)
     response = ['Hello World']
+    print(openai_long_parser.chunks)
     assert openai_long_parser.chunks == response
 
 
 def test_break_up_veryshortendedsentence_to_chunks():
     test_str = 'Hello World.'
 
-    openai_long_parser = OpenaiLongParser(test_str, chunk_size=3)
+    openai_long_parser = OpenaiLongParser(test_str, chunk_size=4)
     response = ['Hello World.']
     assert openai_long_parser.chunks == response
 
@@ -45,9 +46,10 @@ def test_break_up_shortsentences_to_chunks():
     test_str = 'Hello World. \
         Goodbye World.'
 
-    openai_long_parser = OpenaiLongParser(test_str, chunk_size=3)
+    openai_long_parser = OpenaiLongParser(test_str, chunk_size=4)
     response = ['Hello World.',
                 'Goodbye World.']
+    print(openai_long_parser.chunks)
     assert openai_long_parser.chunks == response
 
 

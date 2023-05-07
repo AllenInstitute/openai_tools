@@ -62,6 +62,16 @@ class PdfParser:
         logging.info("Loading the raw text from the PDF file")
         laparams = LAParams()
         text = extract_text(self.pdf_path, laparams=laparams)
+
+        # We remove entire lines in text that contains a single character
+        # This is to remove vertical text, page numbers, etc.
+        array_text = text.split("\n")
+        for index, line in enumerate(array_text):
+            if len(line) == 1:
+                array_text[index] = ""
+        
+        text = "\n".join(array_text)
+
         self.raw_text = text
 
     def save_database(self):
