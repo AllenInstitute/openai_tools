@@ -9,3 +9,6 @@ nltk
 habanero
 bs4
 diskcache
+matplotlib
+scikit-learn
+numpy

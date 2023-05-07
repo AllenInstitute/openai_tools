@@ -21,6 +21,15 @@ def hash_variable(var):
     return hashed_var
 
 
+def hash_file(file_path, algorithm='sha256'):
+    """Return the hash of a file using the specified algorithm."""
+    hasher = hashlib.new(algorithm)
+    with open(file_path, 'rb') as file:
+        while chunk := file.read(8192):
+            hasher.update(chunk)
+    return hasher.hexdigest()
+
+
 class LocalDatabase:
     """This class is used to handle accesses to our local database."""
 

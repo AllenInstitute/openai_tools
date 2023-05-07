@@ -4,6 +4,9 @@
 import logging
 from papers_extractor.openai_parsers import OpenaiLongParser
 from papers_extractor.database_parser import hash_variable
+from sklearn.manifold import TSNE
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 class LongPaper:
@@ -58,6 +61,58 @@ class LongPaper:
             logging.info("Saving long paper to database")
             self.database.save_class_to_database(self.database_id, self)
 
+    def get_average_embedding(self):
+        """Returns the average embedding of the long paper."""
+        if self.embedding is None:
+            logging.info("Embedding not available, calculating it")
+            self.calculate_embedding()
+        return np.mean(self.embedding, axis=0)
+
+    def plot_tsne_embedding(self, save_figure_path=None,
+                            perplexity=5, random_state=42):
+        """This function plots the t-SNE embeddings of the long paper.
+        Args:
+            save_figure_path (str): The path to save the figure to. If set to
+            None, the figure will not be saved. Defaults to None.
+            perplexity (int): The perplexity to use for the t-SNE. Defaults to
+            5.
+            random_state (int): The random state to use for the t-SNE.
+            Defaults to 42.
+        Returns:
+            fig (matplotlib.pyplot.figure): The figure of the t-SNE plot.
+        """
+
+        if self.embedding is None:
+            logging.info("Embedding not available, calculating it")
+            self.calculate_embedding()
+
+        matrix = np.array(self.embedding)
+
+        # Create a t-SNE model and transform the data
+        tsne = TSNE(n_components=2,
+                    perplexity=perplexity,
+                    random_state=random_state,
+                    init='random',
+                    learning_rate=200)
+        logging.info("Fitting t-SNE")
+        vis_dims = tsne.fit_transform(matrix)
+
+        x = [x for x, y in vis_dims]
+        y = [y for x, y in vis_dims]
+
+        fig = plt.figure(figsize=(10, 10))
+        plt.scatter(x, y)
+        # Add text next to each dot
+
+        for i, text in enumerate(self.chunks):
+            plt.text(x[i] + 1, y[i] + 1, text, fontsize=7)
+
+        plt.title("t-SNE of the embeddings")
+        if save_figure_path is not None:
+            plt.savefig(save_figure_path)
+
+        return fig
+
     def calculate_embedding(self, parser="GPT"):
         """This function extracts semantic embeddings in chunks
         from the long text.
@@ -76,7 +131,7 @@ class LongPaper:
             if parser == "GPT":
                 local_openai = OpenaiLongParser(self.longtext,
                                                 chunk_size=self.chunk_size)
-                self.embedding = \
+                self.embedding, self.chunks = \
                     local_openai.process_chunks_through_embedding()
                 self.save_database()
                 return self.embedding
