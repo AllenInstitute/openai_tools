@@ -6,16 +6,19 @@ from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
 import colorsys
 from adjustText import adjust_text
-import logging
 
 # These are helper functions to plot the embedding map
+
+
 def hsv_to_rgb(h, s, v):
     return np.array([round(i * 255) for i in colorsys.hsv_to_rgb(h, s, v)])
+
 
 def get_spectrum_colors(N):
     hue_step = 1.0 / N
     colors = [hsv_to_rgb(i * hue_step, 0.75, 1) / 255 for i in range(N)]
     return colors
+
 
 class MultiPaper:
     """This class is used to group function that apply to many papers"""
@@ -27,7 +30,7 @@ class MultiPaper:
             You should use the LongPaper class to create them and then
             pass them to this class as a list.
             labels_list (list): The list of labels for each long paper. These
-            labels will be used to add legends to all plots and analysis. It 
+            labels will be used to add legends to all plots and analysis. It
             is important that the labels are unique and of the same size as
             the longpapers_list.
             """
@@ -37,7 +40,7 @@ class MultiPaper:
             logging.error("The number of long papers and labels "
                           "must be the same")
             assert False
-        
+
         if len(set(self.labels_list)) != len(self.labels_list):
             logging.error("The labels must be unique")
             assert False
@@ -57,7 +60,7 @@ class MultiPaper:
                 self.papers_embedding[local_label] = paper_embedding
 
         return self.papers_embedding
-    
+
     def plot_paper_embedding_map(self, save_path=None):
         """This is used to plot the embedding map of all papers
         Args:
@@ -87,7 +90,7 @@ class MultiPaper:
                     random_state=40,
                     init='random',
                     learning_rate=200)
-        
+
         logging.info("Fitting t-SNE")
 
         vis_dims = tsne.fit_transform(tsne_input_matrix)
@@ -119,7 +122,7 @@ class MultiPaper:
         plt.scatter(x, y, c=[color_dict[filename] for filename in all_legends])
 
         # We add a text on the plot along with each scatter of plot
-        # We only print for unique filenames and average the x and y 
+        # We only print for unique filenames and average the x and y
         # coordinates
         all_texts = []
         x_list_avg = []
@@ -139,7 +142,7 @@ class MultiPaper:
                 filename,
                 fontsize=7,
                 color=color_dict[filename])
-            
+
             all_texts.append(local_text)
             x_list_avg.append(x_avg)
             y_list_avg.append(y_avg)
