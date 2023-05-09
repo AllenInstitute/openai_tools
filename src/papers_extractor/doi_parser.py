@@ -5,6 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 import logging
 
+
 class DoiParser:
     """This class is used to handle DOI links and extract the
     publication metadata from them. This includes the title, authors,
@@ -45,7 +46,8 @@ class DoiParser:
         if self.pmid:
             return self.pmid
         else:
-            base_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
+            base_url = ("https://eutils.ncbi.nlm.nih.gov/"
+                        "entrez/eutils/esearch.fcgi")
             params = {
                 "db": "pubmed",
                 "term": f"{self.doi}[DOI]",
@@ -57,7 +59,7 @@ class DoiParser:
 
             soup = BeautifulSoup(response.content, "xml")
             pmid_tag = soup.find("Id")
-            
+
             if pmid_tag:
                 self.pmid = pmid_tag.text
                 return self.pmid
@@ -66,13 +68,13 @@ class DoiParser:
                 logging.warning(f"Could not find PMID for DOI {self.doi}")
                 return self.pmid
 
-    def get_metadata_from_crossref(self):        
+    def get_metadata_from_crossref(self):
         if self.metadata_crossref:
             return self.metadata_crossref
         else:
             cr = Crossref()
             self.metadata_crossref = cr.works(ids=self.doi)
-            
+
             return self.metadata_crossref
 
     def get_metadata_from_pubmed(self):
@@ -86,7 +88,8 @@ class DoiParser:
                     f"Could not find pubmed metadata for DOI {self.doi}")
                 return self.metadata_pubmed
             else:
-                base_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
+                base_url = ("https://eutils.ncbi.nlm.nih.gov/"
+                            "entrez/eutils/efetch.fcgi")
                 params = {
                     "db": "pubmed",
                     "retmode": "xml",
@@ -108,7 +111,8 @@ class DoiParser:
 
                 authors = []
                 for author in soup.find_all("Author"):
-                    author_name = f"{author.find('ForeName').text} {author.find('LastName').text}"
+                    author_name = (f"{author.find('ForeName').text} \
+                                   {author.find('LastName').text}")
                     authors.append(author_name)
                 metadata["authors"] = authors
 
@@ -117,12 +121,16 @@ class DoiParser:
                     pub_year = pub_date_tag.find("Year")
                     pub_month = pub_date_tag.find("Month")
                     pub_day = pub_date_tag.find("Day")
-                    metadata["pub_date"] = f"{pub_year.text if pub_year else ''}-{pub_month.text if pub_month else ''}-{pub_day.text if pub_day else ''}"
+                    metadata["pub_date"] = (
+                        f"{pub_year.text if pub_year else ''}-\
+                            {pub_month.text if pub_month else ''}-\
+                                {pub_day.text if pub_day else ''}"
+                    )
 
                 abstract_tag = soup.find("AbstractText")
                 if abstract_tag:
                     metadata["abstract"] = abstract_tag.text
-                
+
                 self.metadata_pubmed = metadata
 
                 return self.metadata_pubmed
@@ -141,26 +149,28 @@ class DoiParser:
                 logging.warning(f"Could not find title for DOI {self.doi}")
                 title = None
         return title
-    
+
     def get_abstract(self):
         # Try fetching abstract from CrossRef API
         metadata = self.get_metadata_from_crossref()
         if "message" in metadata and "abstract" in metadata["message"]:
             return metadata["message"]["abstract"]
         else:
-            logging.warning(f"Could not find abstract for DOI {self.doi} through CrossRef API")
-            logging.warning(f"Trying to fetch abstract from Pubmed API")
-        
+            logging.warning(
+                f"Could not find abstract for DOI {self.doi} through CrossRef")
+            logging.warning("Trying to fetch abstract from Pubmed API")
+
         # Try fetching abstract from Pubmed API
         metadata = self.get_metadata_from_pubmed()
         if metadata and "abstract" in metadata:
             return metadata["abstract"]
         else:
-            logging.warning(f"Could not find abstract for DOI {self.doi} through Pubmed API")
+            logging.warning(
+                f"Could not find abstract for DOI {self.doi} through Pubmed")
 
-        logging.warning(f"abstract not found for DOI {self.doi}")    
+        logging.warning(f"abstract not found for DOI {self.doi}")
         return None
-    
+
     def get_authors(self):
         """This function extracts the authors from the metadata."""
         metatdata = self.get_metadata_from_crossref()
@@ -185,7 +195,7 @@ class DoiParser:
         else:
             logging.warning(f"Could not find first author for DOI {self.doi}")
             return None
-    
+
     def get_pdf_link(self):
         """This function extracts the pdf link from the metadata."""
         metatdata = self.get_metadata_from_crossref()
@@ -229,13 +239,15 @@ class DoiParser:
                 year = metatdata["pub_date"].split("-")[0]
             else:
                 logging.warning(f"Could not find year for DOI {self.doi}")
-                year = None 
-        return year 
-    
+                year = None
+        return year
+
     def get_journal(self):
         """This function extracts the journal from the metadata."""
         metatdata = self.get_metadata_from_crossref()
-        if "message" in metatdata and "container-title" in metatdata["message"] and len(metatdata["message"]["container-title"]) > 0:
+        if ("message" in metatdata
+            and "container-title" in metatdata["message"]
+                and len(metatdata["message"]["container-title"]) > 0):
             journal = metatdata['message']['container-title'][0]
         else:
             # We try through the pubmed API
@@ -244,15 +256,15 @@ class DoiParser:
                 journal = metatdata["journal"]
             else:
                 logging.warning(f"Could not find journal for DOI {self.doi}")
-                journal = None 
-        
+                journal = None
+
         # We do some cleaning of the journal name
         if "bioRxiv" in journal:
             journal = "bioRxiv"
         return journal
-    
+
     def get_citation(self):
-        """This returns a standard paper citation in the form 
+        """This returns a standard paper citation in the form
         of first author last name et al. - year - journal"""
         first_author = self.get_first_author()
         year = self.get_year()

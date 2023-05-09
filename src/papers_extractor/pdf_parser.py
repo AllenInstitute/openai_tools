@@ -54,7 +54,7 @@ class PdfParser:
 
             # We load the database if it exists
             self.database.load_class_from_database(self.database_id, self)
-            
+
         if self.raw_text is None:
             # No need to load the raw text if it was loaded from the database
             self.load_raw_text()
