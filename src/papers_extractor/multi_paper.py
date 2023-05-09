@@ -119,7 +119,7 @@ class MultiPaper:
         plt.gca().set_facecolor('black')
 
         # We plot each point with the color corresponding to its filename
-        plt.scatter(x, y, 
+        plt.scatter(x, y,
                     c=[color_dict[filename] for filename in all_legends], s=5)
 
         # We add a text on the plot along with each scatter of plot
