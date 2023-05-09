@@ -12,3 +12,4 @@ diskcache
 matplotlib
 scikit-learn
 numpy
+lxml
