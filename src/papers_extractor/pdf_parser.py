@@ -36,7 +36,6 @@ class PdfParser:
         self.cut_bibliography = cut_bibliography
         self.database = local_database
         self.database_id = database_id
-        self.load_raw_text()
 
         # We load from the database if requested
         # This will overwrite the raw text if it exists
@@ -55,6 +54,10 @@ class PdfParser:
 
             # We load the database if it exists
             self.database.load_class_from_database(self.database_id, self)
+            
+        if self.raw_text is None:
+            # No need to load the raw text if it was loaded from the database
+            self.load_raw_text()
 
     def load_raw_text(self):
         """Loads the raw text from the PDF file."""
