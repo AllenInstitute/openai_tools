@@ -91,7 +91,7 @@ class OpenaiLongParser:
     tokens limit.
     """
 
-    def __init__(self, longtext, chunk_size=1400, max_concurrent_calls=10):
+    def __init__(self, longtext, chunk_size=1400, max_concurrent_calls=8):
         """Initializes the class.
         Args:
             longtext (str): The text to submit to the API.
