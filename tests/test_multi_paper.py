@@ -25,6 +25,7 @@ def test_multi_paper_creation():
     multi_paper = MultiPaper([first_long, second_long], labels_list)
     assert len(multi_paper.longpapers_list) == 2
 
+
 def test_multi_paper_embedding():
     first_long = LongPaper("This is a test")
     second_long = LongPaper("This is a second test")
@@ -33,9 +34,10 @@ def test_multi_paper_embedding():
 
     multi_paper = MultiPaper([first_long, second_long], labels_list)
     multi_paper.get_embedding_all_papers()
-    
+
     assert len(multi_paper.papers_embedding) == 2
     assert len(multi_paper.papers_embedding["first"][0]) == 1536
+
 
 def test_multi_paper_plot():
     first_long = LongPaper("This is a test")
@@ -53,6 +55,7 @@ def test_multi_paper_plot():
 
         # We check that the file exists
         assert os.path.exists(path_plot)
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, stream=sys.stdout, force=True)
