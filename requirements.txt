@@ -13,4 +13,3 @@ matplotlib
 scikit-learn
 numpy
 lxml
-git+ssh://github.com/Phlya/adjustText.git@333c208ddd9c64fa423c4a2048f1d8bcc1aee063
