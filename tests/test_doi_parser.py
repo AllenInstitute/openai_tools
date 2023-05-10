@@ -1,7 +1,7 @@
 from papers_extractor.doi_parser import DoiParser
 import logging
 import sys
-
+import time
 # Below is a list of DOIs, titles and abstracts of papers that will be used
 # to test the DoiParser class.
 list_doi = [
@@ -97,6 +97,8 @@ def test_all_doi():
         assert doi_parser.get_first_author() == list_first_authors[i]
         assert doi_parser.get_citation() == list_citations[i]
 
+        # Sleep for 1/10 second to avoid being blocked by the server
+        time.sleep(1/10)
 
 def test_author_doi():
     doi_parser = DoiParser('10.1101/2020.03.03.972133')
