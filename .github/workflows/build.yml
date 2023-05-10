@@ -22,7 +22,9 @@ jobs:
         run: pip freeze
 
       - name: Installing requirements
-        run: pip install .
+        run: |
+          pip install . &&
+          pip install https://github.com/Phlya/adjustText/archive/master.zip
 
       - name: Installing dev requirements
         run: pip install -r dev_requirements.txt

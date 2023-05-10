@@ -22,11 +22,16 @@ Installing
 
 ```pip install .```
 
-4. Go the script folder:
+4. We rely on the **adjustText** library for positioning labels that currently 
+only work from the master branch so install it using: 
+
+```pip install https://github.com/Phlya/adjustText/archive/master.zip```
+
+5. Go the script folder:
 
 ```cd scripts```
 
-5. Copy your openAi API key in the .env file. You can find this here: 
+6. Copy your openAi API key in the .env file. You can find this here: 
 https://platform.openai.com/account/api-keys
 
 Running scripts
