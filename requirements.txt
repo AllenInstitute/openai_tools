@@ -13,4 +13,4 @@ matplotlib
 scikit-learn
 numpy
 lxml
-adjustText=1.0b
+adjustText==1.0b
