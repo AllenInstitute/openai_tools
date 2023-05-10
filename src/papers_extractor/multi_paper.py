@@ -61,7 +61,7 @@ class MultiPaper:
 
         return self.papers_embedding
 
-    def plot_paper_embedding_map(self, save_path=None):
+    def plot_paper_embedding_map(self, save_path=None, perplexity=5):
         """This is used to plot the embedding map of all papers
         Args:
             save_path (str): The path to save the plot
@@ -86,7 +86,7 @@ class MultiPaper:
 
         # Create a t-SNE model and transform the data
         tsne = TSNE(n_components=2,
-                    perplexity=5,
+                    perplexity=perplexity,
                     random_state=40,
                     init='random',
                     learning_rate=200)
