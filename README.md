@@ -7,11 +7,10 @@ helpful code for navigating the literature.
 **Please note that this code is experimental.** We encourage others to test it, 
 and if you find it useful, feel free to share your feedback with us.
 
-Running
+Installing
 ========================
 
-1. At the moment, there is a simple script. To run it, you first need to 
-create your conda environment as :
+1. You first need to create your conda environment as :
 
 ```conda create --name <your_env_name> python=3.10```
 
@@ -30,14 +29,43 @@ create your conda environment as :
 5. Copy your openAi API key in the .env file. You can find this here: 
 https://platform.openai.com/account/api-keys
 
-6. Run it using:
+Running scripts
+========================
+
+This package contains a list of classes to facilitate exploring the litterature
+using Large Language Models. Currently, we are focusing on OpenAI API but we 
+plan to extend in the future. Classes are documented and tested but we 
+recommend using our scripts first (in the script/ folder). Those scripts were
+designed to be simple to use and facilitate growing a local database of 
+publication data.  
+
+1. First, after installing, go the script folder:
+
+```cd scripts```
+
+2. You can use 2 scripts currently. 
+
+* The first one is ran using
 
 ```python pdf_summary.py --path_pdf <path_to_your_pdf> --save_summary True```
 
 This will save a little text file along with your pdf with the same filename 
 but with a .txt extension. 
 
-Parameters
+* The second one is ran using 
+
+```python list_pdfs_embedding.py --path_folder <path_to_your_pdfs> --database_path <path_to_a_folder>```
+
+Althought database_path is optional, we highly recommend choosing a folder on 
+your local hard drive to store your paper database. This will limit calls to 
+the Large Language Models and save you time.
+
+Papers embedding could scale to thousands of papers eventually if you process 
+your entire litterature. The embedding is saved automatically in the folder 
+with all your pdfs as ```tsne_embeddings.png```. Currently this plot uses the 
+filename of each pdf to assign a label. 
+
+Parameters for pdf_summary
 ========================
 
 * **--path_pdf**: Path to a PDF file that you want to summarize.
@@ -84,11 +112,21 @@ Type: str
 
 Default: None
 
-Example
+Examples
 ========================
+
+* **paper_summary**
+
 See the example/ folder for example runs. 
 There is a typical short example (length of a typical abstract) and a long 
 summary (using chunk_length 4). 
+
+* **list_pdfs_embedding**
+
+Here is an example embedding for approximately 100 publications, mostly 
+around in vivo calcium imaging of neuronal activity.
+
+![Example embedding](example/tsne_embeddings_example.png)
 
 Database
 ========================
@@ -97,7 +135,11 @@ DiskCache Python package. By specifying the database_path, the module will
 handle everything for you. Its purpose is to compile a collection of papers, 
 complete with statistics and numerical embeddings. Additionally, it 
 automatically regulates the number of calls made to LLM APIs, effectively 
-reducing costs. You can store your database(s) at any location on your local 
+reducing costs.  Any previously processed pdf is 
+automatically cached. To determine if a pdf was previously processed, it uses
+a hash from the content of the pdf, so you can freely rename them.
+
+You can store your database (or several) at any location on your local 
 drive using the **database_path** parameter. 
 
 How to contribute?

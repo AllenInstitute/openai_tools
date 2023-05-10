@@ -97,7 +97,7 @@ if __name__ == "__main__":
     multi_paper = MultiPaper(all_long_papers, all_legends)
 
     # This is the path where the embeddings will be saved
-    save_path = os.path.join(args.path_folder, "tsne_embeddings_test.png")
+    save_path = os.path.join(args.path_folder, "tsne_embeddings.png")
     logging.info("Saving the t-SNE plot to: {}".format(save_path))
 
     # We plot the t-SNE plot
