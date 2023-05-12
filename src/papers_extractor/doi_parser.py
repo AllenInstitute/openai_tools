@@ -150,6 +150,18 @@ class DoiParser:
                 title = None
         return title
 
+    def get_citation_count(self):
+        """This function extracts the citation number from the metadata."""
+        metatdata = self.get_metadata_from_crossref()
+        if ("message" in metatdata 
+            and "is-referenced-by-count" in metatdata["message"]):
+            citation = metatdata['message']['is-referenced-by-count']
+        else:
+            logging.warning(
+                f"Could not find citation number for DOI {self.doi}")
+            citation = None
+        return citation
+
     def get_abstract(self):
         # Try fetching abstract from CrossRef API
         metadata = self.get_metadata_from_crossref()

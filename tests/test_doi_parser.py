@@ -96,10 +96,14 @@ def test_all_doi():
         assert doi_parser.get_year() == list_year[i]
         assert doi_parser.get_first_author() == list_first_authors[i]
         assert doi_parser.get_citation() == list_citations[i]
-
+        assert doi_parser.get_citation_count() >= 0
+        
         # Sleep for 1/10 second to avoid being blocked by the server
         time.sleep(1 / 10)
 
+def test_citation_count():
+    doi_parser = DoiParser('10.1101/2020.03.03.972133')
+    assert doi_parser.get_citation_count() > 50
 
 def test_author_doi():
     doi_parser = DoiParser('10.1101/2020.03.03.972133')
