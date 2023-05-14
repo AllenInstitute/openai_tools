@@ -13,3 +13,4 @@ matplotlib
 scikit-learn
 numpy
 lxml
+feedparser

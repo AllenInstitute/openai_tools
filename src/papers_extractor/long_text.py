@@ -9,9 +9,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-class LongPaper:
-    """This class is used to summarize the text contained in a long paper.
-    It will be processed in chunks of a given size."""
+class LongText:
+    """This class is used to process a long text through Large Language Models.
+    It will be processed in chunks of a given size if needed."""
 
     def __init__(self, longtext, chunk_size=1400, local_database=None,
                  database_id='auto'):
@@ -44,25 +44,25 @@ class LongPaper:
                     hash_variable(self.chunk_size)
             else:
                 self.database_id = database_id
-            logging.info("Database key for long paper: {}"
+            logging.info("Database key for long text: {}"
                          .format(self.database_id))
 
             self.database.load_class_from_database(self.database_id, self)
 
     def reset_database(self):
-        """Resets the database for the long paper if available."""
+        """Resets the database for the long text if available."""
         if self.database is not None:
-            logging.info("Resetting database for long paper")
+            logging.info("Resetting database for long text")
             self.database.reset_key(self.database_id)
 
     def save_database(self):
-        """Saves the long paper to the database if available."""
+        """Saves the long text to the database if available."""
         if self.database is not None:
-            logging.info("Saving long paper to database")
+            logging.info("Saving long text to database")
             self.database.save_class_to_database(self.database_id, self)
 
     def get_average_embedding(self):
-        """Returns the average embedding of the long paper."""
+        """Returns the average embedding of the long text."""
         if self.embedding is None:
             logging.info("Embedding not available, calculating it")
             self.calculate_embedding()
@@ -70,7 +70,7 @@ class LongPaper:
 
     def plot_tsne_embedding(self, save_figure_path=None,
                             perplexity=5, random_state=42):
-        """This function plots the t-SNE embeddings of the long paper.
+        """This function plots the t-SNE embeddings of the long text.
         Args:
             save_figure_path (str): The path to save the figure to. If set to
             None, the figure will not be saved. Defaults to None.
@@ -127,7 +127,7 @@ class LongPaper:
         if self.embedding is not None:
             return self.embedding
         else:
-            logging.info("Calculating embedding for long paper")
+            logging.info("Calculating embedding for long text")
             if parser == "GPT":
                 local_openai = OpenaiLongParser(self.longtext,
                                                 chunk_size=self.chunk_size)

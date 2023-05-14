@@ -1,4 +1,4 @@
-from papers_extractor.long_paper import LongPaper
+from papers_extractor.long_text import LongText
 from papers_extractor.database_parser import LocalDatabase
 import logging
 import sys
@@ -11,7 +11,7 @@ def test_database_start():
 
 def test_content_database():
     longtext = "This is a test"
-    long_paper_obj = LongPaper(longtext)
+    long_paper_obj = LongText(longtext)
     local_database = LocalDatabase()
     local_database.save_class_to_database("test_key", long_paper_obj)
     assert local_database.check_in_database("test_key")
@@ -23,9 +23,9 @@ def test_class_loading_from_database():
     # Here we will ovewrite the content of a local object to
     # test that all properties are correctly loaded from the database
     longtext1 = "This is a first object"
-    long_paper_obj1 = LongPaper(longtext1)
+    long_paper_obj1 = LongText(longtext1)
     longtext2 = "This is a second object"
-    long_paper_obj2 = LongPaper(longtext2)
+    long_paper_obj2 = LongText(longtext2)
 
     local_database = LocalDatabase()
     local_database.save_class_to_database("test_ob1", long_paper_obj1)
@@ -46,7 +46,7 @@ def test_class_loading_from_database():
 
 def test_reset_key():
     longtext = "This is a third object"
-    long_paper_obj = LongPaper(longtext)
+    long_paper_obj = LongText(longtext)
     key = "test_ob3"
     local_database = LocalDatabase()
     local_database.save_class_to_database(key, long_paper_obj)
@@ -58,7 +58,7 @@ def test_reset_key():
 
 def test_list_keys():
     longtext = "This is a fourth object"
-    long_paper_obj = LongPaper(longtext)
+    long_paper_obj = LongText(longtext)
     key = "test_ob4"
     local_database = LocalDatabase()
     local_database.save_class_to_database(key, long_paper_obj)

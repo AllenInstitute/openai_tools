@@ -1,5 +1,5 @@
 from papers_extractor.multi_paper import MultiPaper
-from papers_extractor.long_paper import LongPaper
+from papers_extractor.unique_paper import UniquePaper
 import logging
 import sys
 import os
@@ -17,35 +17,29 @@ openai.api_key = os.environ["OPENAI_API_KEY"]
 
 
 def test_multi_paper_creation():
-    first_long = LongPaper("This is a test")
-    second_long = LongPaper("This is a second test")
+    first_paper = UniquePaper("10.1101/2020.03.03.972133")
+    second_paper = UniquePaper("10.1016/j.celrep.2023.112434")
 
-    labels_list = ["first", "second"]
-
-    multi_paper = MultiPaper([first_long, second_long], labels_list)
-    assert len(multi_paper.longpapers_list) == 2
+    multi_paper = MultiPaper([first_paper, second_paper])
+    assert len(multi_paper.papers_list) == 2
 
 
 def test_multi_paper_embedding():
-    first_long = LongPaper("This is a test")
-    second_long = LongPaper("This is a second test")
+    first_paper = UniquePaper("10.1101/2020.03.03.972133")
+    second_paper = UniquePaper("10.1016/j.celrep.2023.112434")
 
-    labels_list = ["first", "second"]
-
-    multi_paper = MultiPaper([first_long, second_long], labels_list)
+    multi_paper = MultiPaper([first_paper, second_paper])
     multi_paper.get_embedding_all_papers()
 
     assert len(multi_paper.papers_embedding) == 2
-    assert len(multi_paper.papers_embedding["first"][0]) == 1536
+    assert len(multi_paper.papers_embedding[0][0]) == 1536
 
 
 def test_multi_paper_plot():
-    first_long = LongPaper("This is a test")
-    second_long = LongPaper("This is a second test")
+    first_paper = UniquePaper("10.1101/2020.03.03.972133")
+    second_paper = UniquePaper("10.1016/j.celrep.2023.112434")
 
-    labels_list = ["first", "second"]
-
-    multi_paper = MultiPaper([first_long, second_long], labels_list)
+    multi_paper = MultiPaper([first_paper, second_paper])
     multi_paper.get_embedding_all_papers()
 
     # We create a temporary file in pytest tmp folder

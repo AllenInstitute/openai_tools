@@ -2,8 +2,8 @@ import logging
 import os
 import sys
 import pytest
-from papers_extractor.long_paper import LongPaper
 from papers_extractor.pdf_parser import PdfParser
+from papers_extractor.long_text import LongText
 
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(f"{parent_dir}/scripts/")
@@ -25,8 +25,8 @@ def do_summarization(max_concurrent_calls):
     # We bypass the cleaning of the text for the test
     cleaned_text = pdf_parser.get_clean_text()
 
-    # We then use the long paper parser to summarize the content
-    paper_parser = LongPaper(cleaned_text)
+    # We then use the long text parser to summarize the content
+    paper_parser = LongText(cleaned_text)
 
     summary = paper_parser.summarize_longtext_into_chunks(
         final_chunk_length=2,

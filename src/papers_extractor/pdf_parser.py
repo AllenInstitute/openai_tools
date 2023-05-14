@@ -80,7 +80,7 @@ class PdfParser:
     def save_database(self):
         """Saves the pdf data to the database if available."""
         if self.database is not None:
-            logging.info("Saving database for long paper")
+            logging.info("Saving database for long text")
             self.database.save_class_to_database(self.database_id, self)
 
     def remove_bibliography(self, input_text):

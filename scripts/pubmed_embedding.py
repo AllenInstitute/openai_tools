@@ -1,10 +1,10 @@
 import os
 import argparse
 # Import the modules from the papers_extractor package
-from papers_extractor.pdf_parser import PdfParser
-from papers_extractor.long_text import LongText
 from papers_extractor.database_parser import LocalDatabase
 from papers_extractor.multi_paper import MultiPaper
+from papers_extractor.pubmed_papers_parser import PubmedPapersParser
+
 import logging
 
 # Import the dotenv module to load the environment variables
@@ -16,19 +16,38 @@ load_dotenv()
 # Set the logging level to INFO
 # This will print the logs in the console
 # You can remove this line if you don't want to see the logs
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.WARNING)
 
 if __name__ == "__main__":
     script_path = os.path.dirname(os.path.realpath(__file__))
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--path_folder",
-        help="Path to a folder with pdf files",
+        "--pubmed_query",
+        help="Query to search in pubmed",
         type=str,
-        default=os.path.join(
-            script_path,
-            "../../large"),
+        default="Jerome Lecoq"
+    )
+
+    parser.add_argument(
+        "--save_path",
+        help="Path to save the plot",
+        type=str,
+        default="./pubmed_embedding.png",
+    )
+
+    parser.add_argument(
+        "--field",
+        help="Field to use for the embedding",
+        type=str,
+        default="abstract",
+    )
+
+    parser.add_argument(
+        "--add_citation_count",
+        help="Whether to add the citation count to the plot",
+        type=bool,
+        default=False,
     )
 
     parser.add_argument(
@@ -46,18 +65,10 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    def get_list_pdf_files(path_folder):
-        """This function returns a list of all pdf files in a folder"""
-        pdf_files = [
-            os.path.join(path_folder, file)
-            for file in os.listdir(path_folder)
-            if file.endswith(".pdf")
-        ]
-        return pdf_files
-
-    # We get the path all the pdf files in the folder
-    pdf_files = get_list_pdf_files(args.path_folder)
-
+    QueryObject = PubmedPapersParser(args.pubmed_query)
+    QueryObject.search_pubmed()
+    QueryObject.fetch_details()
+    
     database_path = args.database_path
 
     if database_path is not None:
@@ -65,40 +76,24 @@ if __name__ == "__main__":
     else:
         database_obj = None
 
+    list_unique_papers = QueryObject.get_list_unique_papers(local_database=database_obj)
+
     all_legends = []
     all_long_papers = []
 
-    for index, pdf_path in enumerate(pdf_files):
-        logging.info("Processing file: {}".format(pdf_path))
-        logging.info("File number: {}".format(index))
-
-        # We load the pdf parser to extract and clean the content
-        pdf_parser = PdfParser(
-            pdf_path,
-            cut_bibliography=True,
-            local_database=database_obj
-        )
-
-        cleaned_text = pdf_parser.get_clean_text()
-
-        # We then use the long text parser to summarize the content
-        paper_parser = LongText(cleaned_text, local_database=database_obj)
-
-        all_long_papers.append(paper_parser)
-
-        local_embeddings = paper_parser.calculate_embedding()
-
-        # For now we use the filename as the legend
-        filename = os.path.basename(pdf_path)
-
-        all_legends.append(filename.split("-")[0])
+    # We add the citation count to the legend
+    """ if args.add_citation_count:
+        doi_parser = DoiParser(single_paper["doi"])
+        citation_count = doi_parser.get_citation_count()
+        legend = "{} - {} citations".format(legend, citation_count) """
 
     # We create a MultiPaper object to merge all the papers
-    multi_paper = MultiPaper(all_long_papers, all_legends)
+    multi_paper = MultiPaper(list_unique_papers)
 
     # This is the path where the embeddings will be saved
-    save_path = os.path.join(args.path_folder, "tsne_embeddings.png")
+    save_path = args.save_path
+
     logging.info("Saving the t-SNE plot to: {}".format(save_path))
 
     # We plot the t-SNE plot
-    multi_paper.plot_paper_embedding_map(save_path=save_path)
+    multi_paper.plot_paper_embedding_map(save_path=save_path, field=args.field, label='xshort')
