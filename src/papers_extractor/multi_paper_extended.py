@@ -61,7 +61,12 @@ class MultiPaper:
 
         return self.papers_embedding
 
-    def plot_paper_embedding_map(self, save_path=None, perplexity=5, label_proportion=100, list_citations=None):
+    def plot_paper_embedding_map(
+            self,
+            save_path=None,
+            perplexity=5,
+            label_proportion=100,
+            list_citations=None):
         """This is used to plot the embedding map of all papers
         Args:
             save_path (str): The path to save the plot
@@ -84,7 +89,9 @@ class MultiPaper:
             local_legends = [local_key for _ in range(len(local_embeddings))]
             if list_citations is not None:
                 citation_nb = list_citations[local_key]
-                local_citation = [citation_nb for _ in range(len(local_embeddings))]
+                local_citation = [
+                    citation_nb for _ in range(
+                        len(local_embeddings))]
                 all_citations.extend(local_citation)
 
             all_embeddings.extend(local_embeddings)
@@ -129,22 +136,22 @@ class MultiPaper:
         if list_citations is not None:
             all_citations = np.array(all_citations, dtype=np.float32)
             # We log the citation count for each paper
-            all_citations = np.log(all_citations) 
+            all_citations = np.log(all_citations)
             # We normalize the citation count between 1 and 10
-            all_citations = (all_citations - np.min(all_citations)) / (np.max(all_citations) - np.min(all_citations))
+            all_citations = (all_citations - np.min(all_citations)) / \
+                (np.max(all_citations) - np.min(all_citations))
             all_citations = all_citations * 15 + 1
 
             # We convert to int
             all_citations = all_citations.astype(np.int32)
 
-
         # We plot each point with the color corresponding to its filename
         if list_citations is None:
-            plt.scatter(x, y,
-                    c=[color_dict[filename] for filename in all_legends], s=5)
+            plt.scatter(x, y, c=[color_dict[filename]
+                        for filename in all_legends], s=5)
         else:
-            plt.scatter(x, y,
-                    c=[color_dict[filename] for filename in all_legends], s=all_citations)
+            plt.scatter(x, y, c=[color_dict[filename]
+                        for filename in all_legends], s=all_citations)
 
         # We add a text on the plot along with each scatter of plot
         # We only print for unique filenames and average the x and y
@@ -159,7 +166,8 @@ class MultiPaper:
             # If it is below the label_propogation, we add the label
             # to the plot
             # if np.random.randint(0, 100) <= label_proportion:
-            # if ('Neuron' in filename) or ("Nat Methods" in filename) or ("Nat Neurosci" in filename):
+            # if ('Neuron' in filename) or ("Nat Methods" in filename) or
+            #  ("Nat Neurosci" in filename):
             # We first get the index of x to average
             list_index = np.where(np.array(all_legends) == filename)[0]
 
@@ -168,9 +176,10 @@ class MultiPaper:
                 # We then get the average of x and y coordinates
                 x_avg = np.median(np.array(x)[list_index])
                 y_avg = np.median(np.array(y)[list_index])
-                # We then add the text to the plot at the same color as the scatter
+                # We then add the text to the plot at the same color as the
+                # scatter
                 local_text = plt.text(
-                    x_avg,  
+                    x_avg,
                     y_avg,
                     filename,
                     fontsize=3,

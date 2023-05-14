@@ -28,6 +28,7 @@ def check_doi(identifier_string):
         return True
     return False
 
+
 def check_pmid(identifier_string):
     """ Checks if the identifier is a PMID.
     Args:
@@ -36,11 +37,12 @@ def check_pmid(identifier_string):
         bool: True if the identifier is a PMID, False otherwise.
     """
 
-    # PMIDs are numeric that have increasing numbers depending on when 
+    # PMIDs are numeric that have increasing numbers depending on when
     # the paper was recorded in PubMed, ie. the first paper has PMID 1
     if identifier_string.isdigit():
         return True
     return False
+
 
 def check_arxiv(identifier_string):
     """ Checks if the identifier is an arXiv ID.
@@ -54,6 +56,7 @@ def check_arxiv(identifier_string):
     if re.match(r'[a-z\-]+(\.[a-z\-]+)?/\d{4}\.\d{4,5}', identifier_string):
         return True
     return False
+
 
 def identify(identifier_string):
     """ Identifies the type of identifier.
@@ -72,7 +75,8 @@ def identify(identifier_string):
     else:
         return 'Unknown'
 
-def check_string_length(string, min_length, max_length):   
+
+def check_string_length(string, min_length, max_length):
     """ Checks if the string is of the right length.
     Args:
         string (str): The string to check.
@@ -86,6 +90,7 @@ def check_string_length(string, min_length, max_length):
     if len(string) >= min_length and len(string) <= max_length:
         return True
     return False
+
 
 def get_doi_from_pmid(pmid):
     """This function extracts the PMID from the DOI link."""
@@ -109,30 +114,32 @@ def get_doi_from_pmid(pmid):
         logging.warning(f"Could not find DOI for PMID {pmid}")
         return None
 
+
 def get_pmid_from_doi(doi):
-        """This function extracts the PMID from the DOI link."""
-        base_url = ("https://eutils.ncbi.nlm.nih.gov/"
-                    "entrez/eutils/esearch.fcgi")
-        params = {
-            "db": "pubmed",
-            "term": f"{doi}[DOI]",
-            "retmode": "xml"
-        }
+    """This function extracts the PMID from the DOI link."""
+    base_url = ("https://eutils.ncbi.nlm.nih.gov/"
+                "entrez/eutils/esearch.fcgi")
+    params = {
+        "db": "pubmed",
+        "term": f"{doi}[DOI]",
+        "retmode": "xml"
+    }
 
-        response = requests.get(base_url, params=params)
-        response.raise_for_status()
+    response = requests.get(base_url, params=params)
+    response.raise_for_status()
 
-        soup = BeautifulSoup(response.content, "xml")
-        pmid_tag = soup.find("Id")
+    soup = BeautifulSoup(response.content, "xml")
+    pmid_tag = soup.find("Id")
 
-        if pmid_tag:
-            pmid = pmid_tag.text
-            return pmid
-        else:
-            pmid = None
-            logging.warning(f"Could not find PMID for DOI {doi}")
-            return pmid
-        
+    if pmid_tag:
+        pmid = pmid_tag.text
+        return pmid
+    else:
+        pmid = None
+        logging.warning(f"Could not find PMID for DOI {doi}")
+        return pmid
+
+
 class UniquePaper:
     """This class is used to hold the information of a given paper.
     """
@@ -168,7 +175,7 @@ class UniquePaper:
         else:
             raise ValueError("The identifier {} is not a recognized \
 publication identifier.".format(identifier))
-        
+
         self.database = local_database
 
         # These are all the standard fields a paper could have
@@ -192,10 +199,10 @@ publication identifier.".format(identifier))
         # These are fields constructed through API calls
         self.metadata_crossref = None
         self.metadata_pubmed = None
-        
+
         # This is today's date
         self.last_update = datetime.datetime.now()
-        
+
         # We attempt to retrieve the paper from the database if available
         if self.database is not None:
             local_id = self.get_database_id()
@@ -214,7 +221,9 @@ publication identifier.".format(identifier))
         """
         if self.abstract is None:
             if not check_string_length(abstract, 10, 10000):
-                raise ValueError(f"The abstract for {self.identifier} is not the right length.")
+                raise ValueError(
+                    (f"The abstract for {self.identifier} is not the " +
+                     "right length."))
             self.abstract = abstract
         else:
             logging.info(f"The abstract for {self.doi} already set.")
@@ -232,7 +241,7 @@ publication identifier.".format(identifier))
             self.title = title
         else:
             logging.info(f"The title for {self.doi} already set.")
-    
+
     def set_authors(self, authors):
         """Sets the authors of the paper.
         Args:
@@ -251,7 +260,7 @@ publication identifier.".format(identifier))
             self.authors = authors
         else:
             logging.info(f"The authors for {self.doi} already set.")
-    
+
     def set_journal(self, journal):
         """Sets the journal of the paper.
         Args:
@@ -265,7 +274,7 @@ publication identifier.".format(identifier))
             self.journal = journal
         else:
             logging.info(f"The journal for {self.doi} already set.")
-    
+
     def set_year(self, year):
         """Sets the year of the paper.
         Args:
@@ -281,7 +290,7 @@ publication identifier.".format(identifier))
             self.year = year
         else:
             logging.info(f"The year for {self.doi} already set.")
-    
+
     def set_fulltext(self, fulltext):
         """Sets the fulltext of the paper.
         Args:
@@ -309,7 +318,7 @@ publication identifier.".format(identifier))
             self.longsummary = longsummary
         else:
             logging.info(f"The longsummary for {self.doi} already set.")
-    
+
     def set_nb_citations(self, nb_citations):
         """Sets the number of citations of the paper.
         Args:
@@ -342,7 +351,7 @@ publication identifier.".format(identifier))
         else:
             raise ValueError("The paper does not have any identifier.")
         return self.database_id
-        
+
     def reset_database(self):
         """Resets the database for the long paper if available."""
         if self.database is not None:
@@ -356,19 +365,19 @@ publication identifier.".format(identifier))
             self.last_update = datetime.datetime.now()
             self.database.save_class_to_database(self.database_id, self)
 
-    def get_label_string(self, format = 'short'):
+    def get_label_string(self, format='short'):
         """Returns the label string of the paper. This is a standardized strin
-        that contains the title, authors and year of the paper as well as more 
+        that contains the title, authors and year of the paper as well as more
         information depending on the requested format.\
-        
+
         Args:
-            format (str): The format of the label string. Can be 'xshort', 
+            format (str): The format of the label string. Can be 'xshort',
             'short', 'medium', 'long', 'xlong'. Defaults to 'short'.
         Returns:
             str: The label string of the paper.
             If the format is 'xshort', the label string will be first author et
             al, publication year.
-            If the format is 'short', the label string will be first author et 
+            If the format is 'short', the label string will be first author et
             al, publication year, journal.
             If the format is 'medium', the label string will be first author et
             al, publication year, journal, title.
@@ -376,7 +385,7 @@ publication identifier.".format(identifier))
             publication year, journal, title.
             If the format is 'xlong', the label string will be all authors
             , publication year, journal, title, abstract."""
-        
+
         first_author_lastname = self.get_first_author()
         local_year = self.get_year()
 
@@ -390,7 +399,7 @@ publication identifier.".format(identifier))
             local_authors = ', '.join(local_authors)
             if local_authors is None:
                 raise ValueError("The paper does not have any author.")
-            
+
         if format != 'xshort':
             local_journal = self.get_journal()
             if self.journal is None:
@@ -400,7 +409,7 @@ publication identifier.".format(identifier))
             local_title = self.get_title()
             if self.title is None:
                 raise ValueError("The paper does not have any title.")
-        
+
         if format == 'xlong':
             local_abstract = self.get_abstract()
             if self.abstract is None:
@@ -431,7 +440,7 @@ publication identifier.".format(identifier))
             'abstract', 'title', 'fulltext', 'longsummary'. Defaults to
             'abstract'.
         Returns:
-            embedding: The averaged embedding of the field.            
+            embedding: The averaged embedding of the field.
         """
 
         local_embedding = self.calculate_embedding(field=field)
@@ -463,7 +472,7 @@ publication identifier.".format(identifier))
         if local_text is None:
             raise ValueError(f"The field {field} is not available for this \
 paper.")
-                             
+
         # We check if the embedding of that field is already available
         local_embedding = getattr(self, f"{field}_embedding")
         if local_embedding is not None:
@@ -562,7 +571,7 @@ paper.")
                 return None
             self.pmid = get_pmid_from_doi(self.doi)
             return self.pmid
-        
+
     def get_title(self):
         """This function extracts the title from the metadata."""
         if self.title:
@@ -588,8 +597,8 @@ paper.")
             return self.nb_citations
         else:
             metadata = self.get_metadata_from_crossref()
-            if ("message" in metadata 
-                and "is-referenced-by-count" in metadata["message"]):
+            if ("message" in metadata
+                    and "is-referenced-by-count" in metadata["message"]):
                 nb_citations = metadata['message']['is-referenced-by-count']
             else:
                 logging.warning(
@@ -609,7 +618,9 @@ paper.")
                 return self.abstract
             else:
                 logging.warning(
-                    f"Could not find abstract for DOI {self.doi} through CrossRef")
+                    (f"Could not find abstract for DOI {self.doi} " +
+                     "through CrossRef")
+                )
                 logging.warning("Trying to fetch abstract from Pubmed API")
 
             # Try fetching abstract from Pubmed API
@@ -619,7 +630,9 @@ paper.")
                 return self.abstract
             else:
                 logging.warning(
-                    f"Could not find abstract for DOI {self.doi} through Pubmed")
+                    (f"Could not find abstract for DOI {self.doi} " +
+                     "through Pubmed")
+                )
 
             logging.warning(f"abstract not found for DOI {self.doi}")
             self.abstract = None
@@ -633,7 +646,7 @@ paper.")
             metadata = self.get_metadata_from_crossref()
             if "message" in metadata and "author" in metadata["message"]:
                 authors = metadata['message']['author']
-                # We merge the given and family names as Crossref separates 
+                # We merge the given and family names as Crossref separates
                 # them
                 for index, author in enumerate(authors):
                     author = f"{author['given']} {author['family']}"
@@ -644,7 +657,8 @@ paper.")
                 if metadata and "authors" in metadata:
                     authors = metadata["authors"]
                 else:
-                    logging.warning(f"Could not find authors for DOI {self.doi}")
+                    logging.warning(
+                        f"Could not find authors for DOI {self.doi}")
                     authors = None
             self.authors = authors
             return self.authors
@@ -675,7 +689,8 @@ paper.")
                 response = requests.get(url)
                 if response.status_code == 200:
                     soup = BeautifulSoup(response.text, 'html.parser')
-                    pdf_link = soup.find('a', class_='article-dl-pdf-link')['href']
+                    pdf_link = soup.find(
+                        'a', class_='article-dl-pdf-link')['href']
                     self.pdf_url = f"https://www.biorxiv.org{pdf_link}"
                     return self.pdf_url
                 else:
@@ -719,7 +734,7 @@ paper.")
     def get_journal(self):
         """This function extracts the journal from the metadata."""
         if self.journal is None:
-            # We try through the crossref API 
+            # We try through the crossref API
             metadata = self.get_metadata_from_crossref()
             if ("message" in metadata
                 and "container-title" in metadata["message"]
@@ -731,7 +746,8 @@ paper.")
                 if metadata and "journal" in metadata:
                     journal = metadata["journal"]
                 else:
-                    logging.warning(f"Could not find journal for DOI {self.doi}")
+                    logging.warning(
+                        f"Could not find journal for DOI {self.doi}")
                     journal = None
 
             # We do some cleaning of the journal name

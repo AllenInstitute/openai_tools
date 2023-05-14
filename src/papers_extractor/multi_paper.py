@@ -10,6 +10,7 @@ from papers_extractor.unique_paper import UniquePaper
 
 # These are helper functions to compare papers and plot them
 
+
 def hsv_to_rgb(h, s, v):
     return np.array([round(i * 255) for i in colorsys.hsv_to_rgb(h, s, v)])
 
@@ -30,15 +31,16 @@ class MultiPaper:
             You should use the UniquePaper class to create them and then
             pass them to this class as a list.
             """
-        
+
         # We check that the list is not empty
         if not papers_list:
             raise Exception("The list of papers cannot be empty")
-        
+
         # We check that it is a list of UniquePaper
         if not isinstance(papers_list[0], UniquePaper):
-            raise Exception("The list of papers should be a list of UniquePaper")
-        
+            raise Exception(
+                "The list of papers should be a list of UniquePaper")
+
         self.papers_list = papers_list
         self.papers_embedding = None
 
@@ -54,7 +56,12 @@ class MultiPaper:
 
         return self.papers_embedding
 
-    def plot_paper_embedding_map(self, save_path=None, perplexity=5, field='abstract', label='xshort'):
+    def plot_paper_embedding_map(
+            self,
+            save_path=None,
+            perplexity=5,
+            field='abstract',
+            label='xshort'):
         """This is used to plot the embedding map of all papers
         Args:
             save_path (str): The path to save the plot
@@ -76,8 +83,8 @@ class MultiPaper:
 
         for index, local_embeddings in enumerate(list_embeddings):
             local_key = self.papers_list[index].get_label_string(
-                format = label
-                )
+                format=label
+            )
             local_legends = [local_key for _ in range(len(local_embeddings))]
 
             # embeddings can be a list of list
@@ -122,7 +129,7 @@ class MultiPaper:
         plt.gca().set_facecolor('black')
 
         # We plot each point with the color corresponding to its filename
-        plt.scatter(x, 
+        plt.scatter(x,
                     y,
                     c=[color_dict[local_label] for local_label in all_legends],
                     s=5
