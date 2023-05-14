@@ -1,6 +1,7 @@
 from papers_extractor.pubmed_papers_parser import PubmedPapersParser
 import logging
 import sys
+logging.basicConfig(level=logging.INFO, stream=sys.stdout, force=True)
 
 
 def test_search_pubmed():
