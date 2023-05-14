@@ -68,7 +68,7 @@ if __name__ == "__main__":
     QueryObject = PubmedPapersParser(args.pubmed_query)
     QueryObject.search_pubmed()
     QueryObject.fetch_details()
-    
+
     database_path = args.database_path
 
     if database_path is not None:
@@ -97,6 +97,6 @@ if __name__ == "__main__":
     logging.info("Saving the t-SNE plot to: {}".format(save_path))
 
     # We plot the t-SNE plot
-    multi_paper.plot_paper_embedding_map(save_path=save_path, 
-                                         field=args.field, 
+    multi_paper.plot_paper_embedding_map(save_path=save_path,
+                                         field=args.field,
                                          label='xshort')
