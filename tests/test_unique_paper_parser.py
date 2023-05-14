@@ -99,7 +99,7 @@ def test_all_doi():
         assert doi_parser.get_nb_citations() >= 0
 
         # Sleep for 1/10 second to avoid being blocked by the server
-        time.sleep(1 / 10)
+        time.sleep(2 / 10)
 
 
 def test_citation_count():
