@@ -2,7 +2,7 @@ import requests
 from xml.etree import ElementTree as ET
 import logging
 from papers_extractor.unique_paper import UniquePaper
-
+import time
 
 class PubmedPapersParser:
     def __init__(self, query):
@@ -72,6 +72,9 @@ class PubmedPapersParser:
             for article in root.findall('PubmedArticle'):
                 detail = self._parse_article(article)
                 details.append(detail)
+
+            time.sleep(1 / 10)
+
         logging.info("Fetched {} details".format(len(details)))
         self.details = details
 
