@@ -108,7 +108,6 @@ def test_all_doi():
         time.sleep(1 / 10)
 
 
-
 def test_citation_count():
     doi_parser = UniquePaper('10.1101/2020.03.03.972133')
     assert doi_parser.get_nb_citations() > 50
