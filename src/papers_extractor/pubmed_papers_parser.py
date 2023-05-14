@@ -4,6 +4,7 @@ import logging
 from papers_extractor.unique_paper import UniquePaper
 import time
 
+
 class PubmedPapersParser:
     def __init__(self, query):
         """This class is used to parse the papers from pubmed.
