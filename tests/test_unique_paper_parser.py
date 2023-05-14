@@ -89,17 +89,24 @@ def test_all_doi():
         doi_parser = UniquePaper(list_doi[i])
 
         assert doi_parser.get_title().startswith(list_titles[i])
+        time.sleep(1 / 10)
         assert doi_parser.get_abstract().startswith(list_abstracts[i])
+        time.sleep(1 / 10)
         assert doi_parser.get_pdf_url() == list_pdf_links[i]
+        time.sleep(1 / 10)
         assert doi_parser.get_pmid() == list_pmids[i]
+        time.sleep(1 / 10)
         assert doi_parser.get_journal() == list_journal[i]
+        time.sleep(1 / 10)
         assert doi_parser.get_year() == list_year[i]
+        time.sleep(1 / 10)
         assert doi_parser.get_first_author() == list_first_authors[i]
+        time.sleep(1 / 10)
         assert doi_parser.get_label_string() == list_citations[i]
+        time.sleep(1 / 10)
         assert doi_parser.get_nb_citations() >= 0
+        time.sleep(1 / 10)
 
-        # Sleep for 1/10 second to avoid being blocked by the server
-        time.sleep(2 / 10)
 
 
 def test_citation_count():
