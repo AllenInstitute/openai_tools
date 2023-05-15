@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import colorsys
 from adjustText import adjust_text
 from papers_extractor.unique_paper import UniquePaper
+from matplotlib.lines import Line2D
 
 # These are helper functions to compare papers and plot them
 
@@ -61,7 +62,9 @@ class MultiPaper:
             save_path=None,
             perplexity=5,
             field='abstract',
-            label='xshort'):
+            label='xshort',
+            add_citation_count=False
+    ):
         """This is used to plot the embedding map of all papers
         Args:
             save_path (str): The path to save the plot
@@ -80,7 +83,7 @@ class MultiPaper:
         # for each paper
         all_embeddings = []
         all_legends = []
-
+        all_citation_count = []
         for index, local_embeddings in enumerate(list_embeddings):
             local_key = self.papers_list[index].get_label_string(
                 format=label
@@ -91,6 +94,18 @@ class MultiPaper:
             # so we flatten it
             all_legends.extend(local_legends)
             all_embeddings.extend(local_embeddings)
+            if add_citation_count:
+                local_citation_count = (self.papers_list[index]
+                                        .get_nb_citations()
+                                        )
+                if local_citation_count is None:
+                    # We set it to 0 if it is None, there is no great way to
+                    # handle this.
+                    local_citation_count = 0
+                local_citations = [
+                    local_citation_count for _ in range(
+                        len(local_embeddings))]
+                all_citation_count.extend(local_citations)
 
         tsne_input_matrix = np.array(all_embeddings)
 
@@ -128,12 +143,71 @@ class MultiPaper:
         # We change the background color to black
         plt.gca().set_facecolor('black')
 
-        # We plot each point with the color corresponding to its filename
-        plt.scatter(x,
-                    y,
-                    c=[color_dict[local_label] for local_label in all_legends],
-                    s=5
-                    )
+        if len(all_citation_count) > 0:
+            all_citation_count = np.array(all_citation_count, dtype=np.float32)
+            input_citation_count = all_citation_count
+            # We log the citation count for each paper
+            all_citation_count = np.log(all_citation_count + 1)
+            all_citation_count = (all_citation_count
+                                  - np.min(all_citation_count)) / \
+                (np.max(all_citation_count) - np.min(all_citation_count))
+            all_citation_count = all_citation_count * 25 + 1
+
+            # We convert to int
+            all_citation_count = all_citation_count.astype(np.int32)
+            minimum_citation = np.min(input_citation_count)
+            median_citation = np.median(input_citation_count)
+            maximum_citation = np.max(input_citation_count)
+            minimum_dot_size = np.min(all_citation_count)
+            median_dot_size = np.median(all_citation_count)
+            maximum_dot_size = np.max(all_citation_count)
+
+        if len(all_citation_count) == 0:
+            plt.scatter(x, y, c=[color_dict[local_label]
+                        for local_label in all_legends], s=5)
+        else:
+            plt.scatter(x, y, c=[color_dict[local_label]
+                        for local_label in all_legends], s=all_citation_count)
+            # We add a legend to the plot to explain the size based on citation
+            # count
+            local_legend = plt.legend(
+                [Line2D(
+                    [0],
+                    [0],
+                    marker='o',
+                    color='w',
+                    label='Size based on citation count',
+                    markerfacecolor='white',
+                    markersize=np.sqrt(minimum_dot_size)),
+                 Line2D(
+                    [0],
+                    [0],
+                    marker='o',
+                    color='w',
+                    label='Size based on citation count',
+                    markerfacecolor='white',
+                    markersize=np.sqrt(median_dot_size)),
+                 Line2D(
+                    [0],
+                    [0],
+                    marker='o',
+                    color='w',
+                    label='Size based on citation count',
+                    markerfacecolor='white',
+                    markersize=np.sqrt(maximum_dot_size))],
+                [f'{int(minimum_citation)} citations',
+                    f'{int(median_citation)} citations',
+                 f'{int(maximum_citation)} citations'
+                 ],
+                loc='upper right',
+                fontsize=10,
+            )
+            # Set legend background to transparent
+            local_legend.get_frame().set_alpha(0.0)
+
+            # Set legend text color to white
+            for text in local_legend.get_texts():
+                text.set_color("white")
 
         # We add a text on the plot along with each scatter of plot
         # We only print for unique filenames and average the x and y

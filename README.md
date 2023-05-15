@@ -163,6 +163,14 @@ Type: int
 
 Default: 8
 
+* --**add_citation_count**: Whether to change the size of the points 
+based on the citation count. This will make the plot more useful but 
+will take more time to run.
+
+Type: int
+
+Default: 8
+
 Examples
 ========================
 
