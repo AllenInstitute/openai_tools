@@ -135,12 +135,12 @@ class PubmedPapersParser:
 
         detail = {
             'title': title_elem.text if title_elem is not None else None,
-            'abstract': (abstract_elem.text if abstract_elem \
+            'abstract': (abstract_elem.text if abstract_elem
                          is not None else None),
             'journal': journal_elem.text if journal_elem is not None else None,
-            'year': year_elem.text if year_elem is not None  else None,
+            'year': year_elem.text if year_elem is not None else None,
             'authors': authors,
-            'doi': doi_elem.text if doi_elem is not None  else None,
+            'doi': doi_elem.text if doi_elem is not None else None,
             'pmid': pmid,
         }
         return detail
