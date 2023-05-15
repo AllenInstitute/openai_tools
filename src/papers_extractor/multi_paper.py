@@ -293,7 +293,7 @@ class MultiPaper:
                 x_avg,
                 y_avg,
                 local_label,
-                fontsize=3,
+                fontsize=5,
                 color=color_dict[local_label])
 
             all_texts.append(local_text)
