@@ -282,7 +282,7 @@ class MultiPaper:
             # We only print the label if the citation count is above the
             # threshold
             if label_proportion == 'top':
-                if local_citation < citation_threshold:
+                if local_citation[0] < citation_threshold:
                     continue
 
             # We then get the average of x and y coordinates
