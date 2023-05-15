@@ -19,7 +19,7 @@ def hsv_to_rgb(h, s, v):
 
 def get_spectrum_colors(N):
     hue_step = 1.0 / N
-    colors = [hsv_to_rgb(i * hue_step, 0.75, 1) / 255 for i in range(N)]
+    colors = [hsv_to_rgb(i * hue_step, 0.75, 0.75) / 255 for i in range(N)]
     return colors
 
 
@@ -189,7 +189,7 @@ class MultiPaper:
             all_citation_count = (all_citation_count
                                   - np.min(all_citation_count)) / \
                 (np.max(all_citation_count) - np.min(all_citation_count))
-            all_citation_count = all_citation_count * 20 + 1
+            all_citation_count = all_citation_count * 10 + 1
 
             # We convert to int
             all_citation_count = all_citation_count.astype(np.int32)
@@ -277,11 +277,11 @@ class MultiPaper:
         for local_label in unique_labels:
             # We first get the index of x to average
             list_index = np.where(np.array(all_legends) == local_label)[0]
-            local_citation = np.array(input_citation_count)[list_index]
 
             # We only print the label if the citation count is above the
             # threshold
-            if label_proportion == 'top':
+            if label_proportion == 'top':            
+                local_citation = np.array(input_citation_count)[list_index]
                 if local_citation[0] < citation_threshold:
                     continue
 
