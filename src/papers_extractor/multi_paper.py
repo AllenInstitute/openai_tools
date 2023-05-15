@@ -269,8 +269,7 @@ class MultiPaper:
         if label_proportion == 'random':
             # We randomly select a proportion of the labels
             unique_labels = random.sample(unique_labels,
-                                          int(len(unique_labels)
-                                              * 0.2))
+                                          int(len(unique_labels) * 0.2))
         elif label_proportion == 'top':
             # We get the citation threshold
             citation_threshold = np.percentile(input_citation_count, 80)
@@ -282,9 +281,9 @@ class MultiPaper:
 
             # We only print the label if the citation count is above the
             # threshold
-            if (label_proportion == 'top'
-                    and local_citation < citation_threshold):
-                continue
+            if label_proportion == 'top':
+                if local_citation < citation_threshold:
+                    continue
 
             # We then get the average of x and y coordinates
             x_avg = np.median(np.array(x)[list_index])
