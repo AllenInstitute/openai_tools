@@ -3,7 +3,7 @@ import argparse
 
 # Import the modules from the papers_extractor package
 from papers_extractor.pdf_parser import PdfParser
-from papers_extractor.long_paper import LongPaper
+from papers_extractor.long_text import LongText
 from papers_extractor.database_parser import LocalDatabase
 
 import logging
@@ -85,8 +85,8 @@ if __name__ == "__main__":
         local_database=database_obj)
     cleaned_text = pdf_parser.get_clean_text()
 
-    # We then use the long paper parser to summarize the content
-    paper_parser = LongPaper(cleaned_text, local_database=database_obj)
+    # We then use the long text parser to summarize the content
+    paper_parser = LongText(cleaned_text, local_database=database_obj)
 
     # We save the summary in a txt file
     if save_summary:

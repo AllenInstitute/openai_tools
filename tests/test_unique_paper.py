@@ -1,4 +1,4 @@
-from papers_extractor.long_paper import LongPaper
+from papers_extractor.long_text import LongText
 import logging
 import sys
 import os
@@ -16,14 +16,14 @@ openai.api_key = os.environ["OPENAI_API_KEY"]
 
 def test_creating_longtext_short_text():
     longtext = "This is a test"
-    long_paper_obj = LongPaper(longtext)
+    long_paper_obj = LongText(longtext)
 
     assert long_paper_obj.longtext == longtext
 
 
 def test_summarizing_single_chunk_output():
     longtext = "This is a test."
-    long_paper_obj = LongPaper(longtext)
+    long_paper_obj = LongText(longtext)
 
     summary = long_paper_obj.summarize_longtext_into_chunks(
         final_chunk_length=1,
@@ -36,7 +36,7 @@ def test_summarizing_single_chunk_output():
 
 def test_summarizing_double_chunk_output():
     longtext = "This is a test"
-    long_paper_obj = LongPaper(longtext)
+    long_paper_obj = LongText(longtext)
 
     summary = long_paper_obj.summarize_longtext_into_chunks(
         final_chunk_length=2,
@@ -49,7 +49,7 @@ def test_summarizing_double_chunk_output():
 
 def test_embedding_chunks():
     longtext = "This is a test. It contains two sentences."
-    long_paper_obj = LongPaper(longtext, chunk_size=4)
+    long_paper_obj = LongText(longtext, chunk_size=4)
 
     assert long_paper_obj.longtext == longtext
 

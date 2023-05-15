@@ -1,4 +1,4 @@
-from papers_extractor.long_paper import LongPaper
+from papers_extractor.long_text import LongText
 from papers_extractor.database_parser import LocalDatabase
 import logging
 import sys
@@ -15,7 +15,7 @@ load_dotenv()
 # Replace with your own OpenAI API key or set the OPENAI_API_KEY
 openai.api_key = os.environ["OPENAI_API_KEY"]
 
-# We first test the LongPaper class for a short text
+# We first test the LongText class for a short text
 
 # We create a shared database for all tests
 
@@ -28,7 +28,7 @@ def local_database():
 
 def test_content_database(local_database):
     longtext = "This is a test"
-    long_paper_obj = LongPaper(longtext, local_database=local_database)
+    long_paper_obj = LongText(longtext, local_database=local_database)
     long_paper_obj.save_database()
     key_list = local_database.get_list_keys()
     logging.info("Keys in the database: {}".format(key_list))
@@ -37,7 +37,7 @@ def test_content_database(local_database):
 
 def test_long_paper_key(local_database):
     longtext = "This is a test"
-    long_paper_obj = LongPaper(longtext, local_database=local_database)
+    long_paper_obj = LongText(longtext, local_database=local_database)
     local_key = long_paper_obj.database_id
     assert local_key == "a54d88e06612d820bc3be72877c74f257b561b196f34a3e0e" + \
         "1af181e8a78e70c146682b7ead12846"
@@ -45,15 +45,15 @@ def test_long_paper_key(local_database):
 
 def test_long_paper_saving_database(local_database):
     longtext = "This is a test"
-    long_paper_obj = LongPaper(longtext, local_database=local_database)
+    long_paper_obj = LongText(longtext, local_database=local_database)
     long_paper_obj.save_database()
     assert local_database.check_in_database(long_paper_obj.database_id)
 
 
 def test_custom_long_paper_key(local_database):
     longtext = "This is a test"
-    long_paper_obj = LongPaper(longtext, local_database=local_database,
-                               database_id="custom_key")
+    long_paper_obj = LongText(longtext, local_database=local_database,
+                              database_id="custom_key")
     local_key = long_paper_obj.database_id
     assert local_key == "custom_key"
     long_paper_obj.save_database()
@@ -62,7 +62,7 @@ def test_custom_long_paper_key(local_database):
 
 def test_long_paper_embedding_caching(local_database):
     longtext = "This is a test"
-    long_paper_obj = LongPaper(longtext, local_database=local_database)
+    long_paper_obj = LongText(longtext, local_database=local_database)
     embedding = long_paper_obj.calculate_embedding()
     long_paper_obj.save_database()
     embedding = long_paper_obj.calculate_embedding()
@@ -76,7 +76,7 @@ def test_long_paper_embedding_caching(local_database):
 
 def test_long_paper_summarizing_caching(local_database):
     longtext = "This is a test"
-    long_paper_obj = LongPaper(longtext, local_database=local_database)
+    long_paper_obj = LongText(longtext, local_database=local_database)
     summary = long_paper_obj.summarize_longtext_into_chunks()
     long_paper_obj.save_database()
     summary = long_paper_obj.summarize_longtext_into_chunks()
@@ -88,7 +88,7 @@ def test_long_paper_summarizing_caching(local_database):
 
 def test_reset_database(local_database):
     longtext = "This is a test"
-    long_paper_obj = LongPaper(longtext, local_database=local_database)
+    long_paper_obj = LongText(longtext, local_database=local_database)
     long_paper_obj.save_database()
     check_in = local_database.check_in_database(long_paper_obj.database_id)
     assert check_in

@@ -1,4 +1,4 @@
-from papers_extractor.long_paper import LongPaper
+from papers_extractor.long_text import LongText
 import logging
 import sys
 import openai
@@ -15,7 +15,7 @@ load_dotenv()
 openai.api_key = os.environ["OPENAI_API_KEY"]
 
 
-def test_tsne_plot_longpaper():
+def test_tsne_plot_longtext():
     # This is mostly a smoke test to see if the plot is generated
     list_sentences_to_test = [
         "The vast expanse of the cosmos never ceases to astonish us.\
@@ -25,8 +25,8 @@ def test_tsne_plot_longpaper():
             Our humble place within it.",
     ]
     list_sentences_to_test = "\n".join(list_sentences_to_test)
-    long_paper = LongPaper(list_sentences_to_test, chunk_size=10)
-    figure_handle = long_paper.plot_tsne_embedding(perplexity=3)
+    long_text = LongText(list_sentences_to_test, chunk_size=10)
+    figure_handle = long_text.plot_tsne_embedding(perplexity=3)
     assert figure_handle is not None
 
 
@@ -34,8 +34,8 @@ def test_average_embedding():
     list_sentences_to_test = \
         "The vast expanse of the cosmos never ceases to astonish us."
 
-    long_paper = LongPaper(list_sentences_to_test, chunk_size=3)
-    average_embedding = long_paper.get_average_embedding()
+    long_text = LongText(list_sentences_to_test, chunk_size=3)
+    average_embedding = long_text.get_average_embedding()
     assert len(average_embedding) == 1536
 
 
@@ -43,14 +43,14 @@ def test_calculate_embedding():
     list_sentences_to_test = \
         "The vast expanse of the cosmos never ceases to astonish us."
 
-    long_paper = LongPaper(list_sentences_to_test, chunk_size=3)
-    long_paper.calculate_embedding()
+    long_text = LongText(list_sentences_to_test, chunk_size=3)
+    long_text.calculate_embedding()
 
-    assert np.array(long_paper.embedding).shape == (4, 1536)
+    assert np.array(long_text.embedding).shape == (4, 1536)
 
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, stream=sys.stdout, force=True)
-    test_tsne_plot_longpaper()
     test_average_embedding()
+    test_tsne_plot_longtext()
     test_calculate_embedding()

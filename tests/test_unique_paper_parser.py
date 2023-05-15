@@ -1,4 +1,4 @@
-from papers_extractor.doi_parser import DoiParser
+from papers_extractor.unique_paper import UniquePaper
 import logging
 import sys
 import time
@@ -75,35 +75,47 @@ list_first_authors = [
 ]
 
 list_citations = [
-    'Tang et al. - 2020 - bioRxiv',
-    'Yasuda et al. - 2023 - Cell Reports',
-    'Lecoq et al. - 2021 - Nature Methods',
-    'Kucsko et al. - 2013 - Nature',
-    'Steinmetz et al. - 2017 - eneuro',
-    'Koch et al. - 2022 - Neuron'
+    'Tang et al., 2020, bioRxiv',
+    'Yasuda et al., 2023, Cell Reports',
+    'Lecoq et al., 2021, Nature Methods',
+    'Kucsko et al., 2013, Nature',
+    'Steinmetz et al., 2017, eneuro',
+    'Koch et al., 2022, Neuron'
 ]
 
 
 def test_all_doi():
     for i in range(len(list_doi)):
-        doi_parser = DoiParser(list_doi[i])
+        doi_parser = UniquePaper(list_doi[i])
 
         assert doi_parser.get_title().startswith(list_titles[i])
+        time.sleep(1 / 10)
         assert doi_parser.get_abstract().startswith(list_abstracts[i])
-        assert doi_parser.get_pdf_link() == list_pdf_links[i]
+        time.sleep(1 / 10)
+        assert doi_parser.get_pdf_url() == list_pdf_links[i]
+        time.sleep(1 / 10)
         assert doi_parser.get_pmid() == list_pmids[i]
+        time.sleep(1 / 10)
         assert doi_parser.get_journal() == list_journal[i]
+        time.sleep(1 / 10)
         assert doi_parser.get_year() == list_year[i]
+        time.sleep(1 / 10)
         assert doi_parser.get_first_author() == list_first_authors[i]
-        assert doi_parser.get_citation() == list_citations[i]
-
-        # Sleep for 1/10 second to avoid being blocked by the server
+        time.sleep(1 / 10)
+        assert doi_parser.get_label_string() == list_citations[i]
+        time.sleep(1 / 10)
+        assert doi_parser.get_nb_citations() >= 0
         time.sleep(1 / 10)
 
 
+def test_citation_count():
+    doi_parser = UniquePaper('10.1101/2020.03.03.972133')
+    assert doi_parser.get_nb_citations() > 50
+
+
 def test_author_doi():
-    doi_parser = DoiParser('10.1101/2020.03.03.972133')
-    assert doi_parser.get_authors()[0]['given'] == 'Bowen'
+    doi_parser = UniquePaper('10.1101/2020.03.03.972133')
+    assert doi_parser.get_authors()[0].split(" ")[-1] == 'Tang'
 
 
 if __name__ == "__main__":
