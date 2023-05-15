@@ -48,7 +48,7 @@ publication data.
 
 ```cd scripts```
 
-2. You can use 2 scripts currently. 
+2. You can use 3 scripts currently. 
 
 * The first one is ran using
 
@@ -61,14 +61,19 @@ but with a .txt extension.
 
 ```python list_pdfs_embedding.py --path_folder <path_to_your_pdfs> --database_path <path_to_a_folder>```
 
-Althought database_path is optional, we highly recommend choosing a folder on 
-your local hard drive to store your paper database. This will limit calls to 
-the Large Language Models and save you time.
-
-Papers embedding could scale to thousands of papers eventually if you process 
-your entire litterature. The embedding is saved automatically in the folder 
+The embedding is saved automatically in the folder 
 with all your pdfs as ```tsne_embeddings.png```. Currently this plot uses the 
 filename of each pdf to assign a label. 
+
+* The third one is ran using 
+
+```python pubmed_embedding.py  --pubmed_query "your query" --field abstract --save_path  <path_to_a_png_file> --database_path <path_to_a_folder>```
+
+Althought database_path is optional, we highly recommend choosing a folder on 
+your local hard drive to store your paper database. This will limit calls to 
+the Large Language Models and save you time. 
+Papers embedding could scale to thousands of papers eventually if you process 
+your entire litterature. 
 
 Parameters for pdf_summary
 ========================
@@ -117,6 +122,39 @@ Type: str
 
 Default: None
 
+Parameters for pubmed_embedding
+========================
+
+* --**pubmed_query**: A query made to pubmed. This can return a very large number of 
+publications and they will be processed in chunks. 
+
+Type: str
+
+Default: None
+
+* --**field**: You can embed the title or the abstract currently. Just give 'title'
+or 'abstract'. Your choice here will depends on how much details you want your embedding 
+to rely on. 
+
+Type: str
+
+Default: abstract
+
+* --**database_path**: Path to the database file. This is an optional argument. 
+If path is not provided, no database will be used or created. If the path is 
+provided, the database will be created if it does not exist. If it exists, 
+it will be loaded and used. Use this to grow your database of papers.
+
+Type: str
+
+Default: None
+
+* --**save_path**: Path to a local image file. This is where the plot will be saved. 
+
+Type: str
+
+Default: None
+
 Examples
 ========================
 
@@ -132,6 +170,13 @@ Here is an example embedding for approximately 100 publications, mostly
 around in vivo calcium imaging of neuronal activity.
 
 ![Example embedding](example/tsne_embeddings_example.png)
+
+* **pubmed_embedding**
+
+Here is an example embedding for the following command:
+```python pubmed_embedding.py --pubmed_query "In vivo two photon voltage imaging" --field abstract --save_path ./twophotonvoltage.png```
+
+![Example embedding](example/twophotonvoltage.png)
 
 Database
 ========================
