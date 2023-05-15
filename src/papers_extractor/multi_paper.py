@@ -277,7 +277,7 @@ class MultiPaper:
         for local_label in unique_labels:
             # We first get the index of x to average
             list_index = np.where(np.array(all_legends) == local_label)[0]
-            local_citation = np.array(all_citation_count)[list_index]
+            local_citation = np.array(input_citation_count)[list_index]
 
             # We only print the label if the citation count is above the
             # threshold
