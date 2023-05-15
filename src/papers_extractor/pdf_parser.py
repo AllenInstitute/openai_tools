@@ -45,12 +45,12 @@ class PdfParser:
             if database_id == 'auto':
                 # We hash the file to get a unique key
                 # that is indendent of the path
-                logging.info("Hashing the pdf file to get a unique key")
+                logging.debug("Hashing the pdf file to get a unique key")
                 self.database_id = hash_file(pdf_path)
             else:
                 self.database_id = database_id
-            logging.info("Database key for pdf file: {}"
-                         .format(self.database_id))
+            logging.debug("Database key for pdf file: {}"
+                          .format(self.database_id))
 
             # We load the database if it exists
             self.database.load_class_from_database(self.database_id, self)
@@ -62,7 +62,7 @@ class PdfParser:
     def load_raw_text(self):
         """Loads the raw text from the PDF file."""
 
-        logging.info("Loading the raw text from the PDF file")
+        logging.debug("Loading the raw text from the PDF file")
         laparams = LAParams()
         text = extract_text(self.pdf_path, laparams=laparams)
 
@@ -80,7 +80,7 @@ class PdfParser:
     def save_database(self):
         """Saves the pdf data to the database if available."""
         if self.database is not None:
-            logging.info("Saving database for long text")
+            logging.debug("Saving database for long text")
             self.database.save_class_to_database(self.database_id, self)
 
     def remove_bibliography(self, input_text):
@@ -109,7 +109,7 @@ class PdfParser:
             if self.cut_bibliography:
                 text_cleaned = self.remove_bibliography(self.raw_text)
 
-            logging.info("Cleaning up and compressing the text")
+            logging.debug("Cleaning up and compressing the text")
             openai_prompt = "Clean up formatting, Remove author list, " + \
                 "Remove references & bibliography, Remove page number, " + \
                 "Remove headers and Remove footers from the following " + \

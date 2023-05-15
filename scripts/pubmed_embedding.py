@@ -16,7 +16,7 @@ load_dotenv()
 # Set the logging level to INFO
 # This will print the logs in the console
 # You can remove this line if you don't want to see the logs
-logging.basicConfig(level=logging.WARNING)
+logging.basicConfig(level=logging.INFO)
 
 if __name__ == "__main__":
     script_path = os.path.dirname(os.path.realpath(__file__))
@@ -55,7 +55,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--add_citation_count",
         help="Whether to change the size of the points based on the citation \
-            count. This will make the plot more readable but will take more \
+            count. This will make the plot more useful but will take more \
             time to run.",
         type=bool,
         default=False,
@@ -74,10 +74,26 @@ if __name__ == "__main__":
         default="../../database",
     )
 
+    parser.add_argument(
+        "--max_results",
+        help="Maximum number of results to fetch from pubmed",
+        type=int,
+        default=100,
+    )
+
+    parser.add_argument(
+        "--label_proportion",
+        help="The proportion of labels to plot. Can be 'all', 'random' or \
+            'top'. If 'top' only the top 5% cited papers will be plotted. \
+            Add_citation_count must be True for this to work. \
+            If 'random' only 5% of the papers will be plotted.",
+        type=str,
+        default="top"
+    )
     args = parser.parse_args()
 
     QueryObject = PubmedPapersParser(args.pubmed_query)
-    QueryObject.search_pubmed()
+    QueryObject.search_pubmed(max_results=args.max_results)
     QueryObject.fetch_details()
 
     database_path = args.database_path
@@ -93,12 +109,6 @@ if __name__ == "__main__":
     all_legends = []
     all_long_papers = []
 
-    # We add the citation count to the legend
-    """ if args.add_citation_count:
-        doi_parser = DoiParser(single_paper["doi"])
-        citation_count = doi_parser.get_citation_count()
-        legend = "{} - {} citations".format(legend, citation_count) """
-
     # We create a MultiPaper object to merge all the papers
     multi_paper = MultiPaper(list_unique_papers)
 
@@ -108,10 +118,14 @@ if __name__ == "__main__":
     logging.info("Saving the t-SNE plot to: {}".format(save_path))
 
     # We plot the t-SNE plot
-    multi_paper.plot_paper_embedding_map(save_path=save_path,
-                                         field=args.field,
-                                         perplexity=args.perplexity,
-                                         add_citation_count=(
-                                             args.add_citation_count
-                                         ),
-                                         label='xshort')
+    multi_paper.plot_paper_embedding_map(
+        save_path=save_path,
+        field=args.field,
+        perplexity=args.perplexity,
+        add_citation_count=(
+            args.add_citation_count),
+        label='xshort',
+        plot_title=(
+            "t-SNE for Pubmed " +
+            f"query: {args.pubmed_query}"),
+        label_proportion=args.label_proportion)

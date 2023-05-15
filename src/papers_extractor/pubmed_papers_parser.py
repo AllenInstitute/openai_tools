@@ -76,7 +76,7 @@ class PubmedPapersParser:
 
             time.sleep(1 / 10)
 
-        logging.info("Fetched {} details".format(len(details)))
+        logging.debug("Fetched {} details".format(len(details)))
         self.details = details
 
         return details
@@ -108,9 +108,13 @@ class PubmedPapersParser:
                 unique_paper.set_authors(detail['authors'])
                 unique_paper.save_database()
                 unique_papers.append(unique_paper)
+                logging.info("Created paper object for {}".format(identity))
             except ValueError:
                 logging.warning(
-                    "Could not create unique paper for {}".format(identity))
+                    "Could not create paper object for {}".format(identity))
+            except TypeError:
+                logging.warning(
+                    "Could not create paper object for {}".format(identity))
         return unique_papers
 
     def _parse_article(self, article):
@@ -125,13 +129,15 @@ class PubmedPapersParser:
         doi_elem = article.find(
             'PubmedData/ArticleIdList/ArticleId[@IdType="doi"]')
         pmid = article.find('MedlineCitation/PMID').text
-        authors = [
-            (
-                f"{elem.find('ForeName').text or ''} "
-                f"{elem.find('LastName').text or ''}".strip()
-            )
-            for elem in author_elems
-        ]
+        authors = []
+        for elem in author_elems:
+            forename = ''
+            lastname = ''
+            if elem.find('ForeName') is not None:
+                forename = elem.find('ForeName').text
+            if elem.find('LastName') is not None:
+                lastname = elem.find('LastName').text
+            authors.append(f"{forename} {lastname}".strip())
 
         detail = {
             'title': title_elem.text if title_elem is not None else None,

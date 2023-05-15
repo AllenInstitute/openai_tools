@@ -207,7 +207,7 @@ publication identifier.".format(identifier))
         if self.database is not None:
             local_id = self.get_database_id()
 
-            logging.info(f"Database key for this paper: {local_id}")
+            logging.debug(f"Database key for this paper: {local_id}")
             self.database.load_class_from_database(local_id, self)
 
     # We define the following methods to set the fields of the paper
@@ -226,7 +226,7 @@ publication identifier.".format(identifier))
                      "right length."))
             self.abstract = abstract
         else:
-            logging.info(f"The abstract for {self.doi} already set.")
+            logging.debug(f"The abstract for {self.doi} already set.")
 
     def set_title(self, title):
         """Sets the title of the paper.
@@ -240,7 +240,7 @@ publication identifier.".format(identifier))
                 raise ValueError("The title is not the right length.")
             self.title = title
         else:
-            logging.info(f"The title for {self.doi} already set.")
+            logging.debug(f"The title for {self.doi} already set.")
 
     def set_authors(self, authors):
         """Sets the authors of the paper.
@@ -259,7 +259,7 @@ publication identifier.".format(identifier))
                     raise ValueError("An author is not the right length.")
             self.authors = authors
         else:
-            logging.info(f"The authors for {self.doi} already set.")
+            logging.debug(f"The authors for {self.doi} already set.")
 
     def set_journal(self, journal):
         """Sets the journal of the paper.
@@ -273,7 +273,7 @@ publication identifier.".format(identifier))
                 raise ValueError("The journal is not the right length.")
             self.journal = journal
         else:
-            logging.info(f"The journal for {self.doi} already set.")
+            logging.debug(f"The journal for {self.doi} already set.")
 
     def set_year(self, year):
         """Sets the year of the paper.
@@ -289,7 +289,7 @@ publication identifier.".format(identifier))
                 raise ValueError("The year is not in the right range.")
             self.year = year
         else:
-            logging.info(f"The year for {self.doi} already set.")
+            logging.debug(f"The year for {self.doi} already set.")
 
     def set_fulltext(self, fulltext):
         """Sets the fulltext of the paper.
@@ -303,7 +303,7 @@ publication identifier.".format(identifier))
                 raise ValueError("The fulltext is not the right length.")
             self.fulltext = fulltext
         else:
-            logging.info(f"The fulltext for {self.doi} already set.")
+            logging.debug(f"The fulltext for {self.doi} already set.")
 
     def set_longsummary(self, longsummary):
         """Sets the longsummary of the paper.
@@ -317,7 +317,7 @@ publication identifier.".format(identifier))
                 raise ValueError("The longsummary is not the right length.")
             self.longsummary = longsummary
         else:
-            logging.info(f"The longsummary for {self.doi} already set.")
+            logging.debug(f"The longsummary for {self.doi} already set.")
 
     def set_nb_citations(self, nb_citations):
         """Sets the number of citations of the paper.
@@ -355,13 +355,13 @@ publication identifier.".format(identifier))
     def reset_database(self):
         """Resets the database for the long paper if available."""
         if self.database is not None:
-            logging.info("Resetting database for long paper")
+            logging.debug("Resetting database for long paper")
             self.database.reset_key(self.database_id)
 
     def save_database(self):
         """Saves the long paper to the database if available."""
         if self.database is not None:
-            logging.info("Saving long paper to database")
+            logging.debug("Saving long paper to database")
             self.last_update = datetime.datetime.now()
             self.database.save_class_to_database(self.database_id, self)
 
@@ -476,10 +476,10 @@ paper.")
         # We check if the embedding of that field is already available
         local_embedding = getattr(self, f"{field}_embedding")
         if local_embedding is not None:
-            logging.info("Embedding already available")
+            logging.debug("Embedding already available")
             return local_embedding
         else:
-            logging.info("Calculating embedding for field {}".format(field))
+            logging.debug("Calculating embedding for field {}".format(field))
             if parser == "ada2":
                 local_openai = OpenaiLongParser(local_text)
                 local_embedding, _ = \
@@ -499,7 +499,11 @@ paper.")
                     f"Could not find crossref metadata for DOI {self.doi}")
                 return None
             cr = Crossref()
-            self.metadata_crossref = cr.works(ids=self.doi)
+            try:
+                self.metadata_crossref = cr.works(ids=self.doi)
+            except requests.exceptions.HTTPError as e:
+                logging.error(f"HTTPError for DOI {self.doi}: {e}")
+                return None
 
         return self.metadata_crossref
 

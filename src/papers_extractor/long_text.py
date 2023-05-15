@@ -44,27 +44,27 @@ class LongText:
                     hash_variable(self.chunk_size)
             else:
                 self.database_id = database_id
-            logging.info("Database key for long text: {}"
-                         .format(self.database_id))
+            logging.debug("Database key for long text: {}"
+                          .format(self.database_id))
 
             self.database.load_class_from_database(self.database_id, self)
 
     def reset_database(self):
         """Resets the database for the long text if available."""
         if self.database is not None:
-            logging.info("Resetting database for long text")
+            logging.debug("Resetting database for long text")
             self.database.reset_key(self.database_id)
 
     def save_database(self):
         """Saves the long text to the database if available."""
         if self.database is not None:
-            logging.info("Saving long text to database")
+            logging.debug("Saving long text to database")
             self.database.save_class_to_database(self.database_id, self)
 
     def get_average_embedding(self):
         """Returns the average embedding of the long text."""
         if self.embedding is None:
-            logging.info("Embedding not available, calculating it")
+            logging.debug("Embedding not available, calculating it")
             self.calculate_embedding()
         return np.mean(self.embedding, axis=0)
 
@@ -83,7 +83,7 @@ class LongText:
         """
 
         if self.embedding is None:
-            logging.info("Embedding not available, calculating it")
+            logging.debug("Embedding not available, calculating it")
             self.calculate_embedding()
 
         matrix = np.array(self.embedding)
@@ -94,7 +94,7 @@ class LongText:
                     random_state=random_state,
                     init='random',
                     learning_rate=200)
-        logging.info("Fitting t-SNE")
+        logging.debug("Fitting t-SNE")
         vis_dims = tsne.fit_transform(matrix)
 
         x = [x for x, y in vis_dims]
@@ -127,7 +127,7 @@ class LongText:
         if self.embedding is not None:
             return self.embedding
         else:
-            logging.info("Calculating embedding for long text")
+            logging.debug("Calculating embedding for long text")
             if parser == "GPT":
                 local_openai = OpenaiLongParser(self.longtext,
                                                 chunk_size=self.chunk_size)
@@ -166,7 +166,7 @@ class LongText:
             # we initialize the number of chunks to a large number
             nb_chunks = final_chunk_length + 1
 
-            logging.info("Summarizing the text in chunks")
+            logging.debug("Summarizing the text in chunks")
             while True:
                 local_openai = OpenaiLongParser(
                     current_text,
@@ -175,7 +175,7 @@ class LongText:
                 nb_chunks = len(local_openai.chunks)
                 if nb_chunks <= final_chunk_length:
                     break
-                logging.info(f"Summarizing chunks:{nb_chunks}")
+                logging.debug(f"Summarizing chunks:{nb_chunks}")
 
                 summarized_chunks = local_openai.process_chunks_through_prompt(
                     openai_prompt, temperature=0, presence_penalty=-0.5
@@ -192,7 +192,7 @@ class LongText:
                 chunk_size=2000,
                 max_concurrent_calls=max_concurrent_calls)
             if final_long.num_chunks == 1:
-                logging.info("Cleaning up the summary")
+                logging.debug("Cleaning up the summary")
 
                 prompt = "Can you clean up this publication summary to " + \
                     "make it flow logically. Keep this summary very " + \

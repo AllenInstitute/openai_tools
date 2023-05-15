@@ -8,6 +8,7 @@ import colorsys
 from adjustText import adjust_text
 from papers_extractor.unique_paper import UniquePaper
 from matplotlib.lines import Line2D
+import random
 
 # These are helper functions to compare papers and plot them
 
@@ -18,7 +19,7 @@ def hsv_to_rgb(h, s, v):
 
 def get_spectrum_colors(N):
     hue_step = 1.0 / N
-    colors = [hsv_to_rgb(i * hue_step, 0.75, 1) / 255 for i in range(N)]
+    colors = [hsv_to_rgb(i * hue_step, 0.75, 0.75) / 255 for i in range(N)]
     return colors
 
 
@@ -41,7 +42,6 @@ class MultiPaper:
         if not isinstance(papers_list[0], UniquePaper):
             raise Exception(
                 "The list of papers should be a list of UniquePaper")
-
         self.papers_list = papers_list
         self.papers_embedding = None
 
@@ -53,8 +53,13 @@ class MultiPaper:
 
             for index, indiv_paper in enumerate(self.papers_list):
                 paper_embedding = indiv_paper.calculate_embedding(field=field)
+                # We save the database after each paper embedding is calculated
+                indiv_paper.save_database()
                 self.papers_embedding.append(paper_embedding)
-
+                logging.debug(
+                    f"Embedding for paper {indiv_paper.identifier} calculated")
+                logging.info(("Papers embedding processed: " +
+                              f"{index} / {len(self.papers_list)}"))
         return self.papers_embedding
 
     def plot_paper_embedding_map(
@@ -63,7 +68,9 @@ class MultiPaper:
             perplexity=5,
             field='abstract',
             label='xshort',
-            add_citation_count=False
+            add_citation_count=False,
+            plot_title=None,
+            label_proportion='all',
     ):
         """This is used to plot the embedding map of all papers
         Args:
@@ -73,7 +80,31 @@ class MultiPaper:
             'title', 'longsummary' or 'fulltext'
             label (str): The label to use for the plot. Can be 'xshort'
             , 'short', 'medium', 'long' or 'xlong'
+            add_citation_count (bool): Whether to add the citation count. This
+            will take a bit longer to process as it will query APIs for that
+            information.
+            plot_title (str): The title of the plot.
+            label_proportion (str): The proportion of labels to plot. Can be
+            'all', 'random' or 'top'. If 'top' only the top 5% cited papers
+            will be plotted. Add_citation_count must be True for this to work.
+            If 'random' only 5% of the papers will be plotted.
+        Returns:
+            None
         """
+
+        # We check the arguments
+        if label_proportion not in ['all', 'random', 'top']:
+            raise Exception(("label_proportion must be 'all', 'random' " +
+                             "or 'top'"))
+        if label_proportion == 'top' and not add_citation_count:
+            raise Exception(("label_proportion 'top' requires " +
+                             "add_citation_count to be True"))
+        if label not in ['xshort', 'short', 'medium', 'long', 'xlong']:
+            raise Exception(("label must be 'xshort', 'short', 'medium', " +
+                             "'long' or 'xlong'"))
+        if field not in ['abstract', 'title', 'longsummary', 'fulltext']:
+            raise Exception(("field must be 'abstract', 'title', " +
+                             "'longsummary' or 'fulltext'"))
 
         list_embeddings = self.get_embedding_all_papers(field=field)
 
@@ -106,7 +137,14 @@ class MultiPaper:
                     local_citation_count for _ in range(
                         len(local_embeddings))]
                 all_citation_count.extend(local_citations)
+                logging.debug("Got citation count for paper " +
+                              "{self.papers_list[index].identifier}")
+                # We save the database toi avoid losing the citation count
+                self.papers_list[index].save_database()
+                logging.info(f"Papers citation processed: {index} / " +
+                             f"{len(self.papers_list)}")
 
+        logging.warning(f"Number of included papers: {index}")
         tsne_input_matrix = np.array(all_embeddings)
 
         # Create a t-SNE model and transform the data
@@ -151,15 +189,17 @@ class MultiPaper:
             all_citation_count = (all_citation_count
                                   - np.min(all_citation_count)) / \
                 (np.max(all_citation_count) - np.min(all_citation_count))
-            all_citation_count = all_citation_count * 25 + 1
+            all_citation_count = all_citation_count * 10 + 1
 
             # We convert to int
             all_citation_count = all_citation_count.astype(np.int32)
             minimum_citation = np.min(input_citation_count)
             median_citation = np.median(input_citation_count)
+            top_20_citation = np.percentile(input_citation_count, 80)
             maximum_citation = np.max(input_citation_count)
             minimum_dot_size = np.min(all_citation_count)
             median_dot_size = np.median(all_citation_count)
+            top_20_dot_size = np.percentile(all_citation_count, 80)
             maximum_dot_size = np.max(all_citation_count)
 
         if len(all_citation_count) == 0:
@@ -194,10 +234,19 @@ class MultiPaper:
                     color='w',
                     label='Size based on citation count',
                     markerfacecolor='white',
+                    markersize=np.sqrt(top_20_dot_size)),
+                 Line2D(
+                    [0],
+                    [0],
+                    marker='o',
+                    color='w',
+                    label='Size based on citation count',
+                    markerfacecolor='white',
                     markersize=np.sqrt(maximum_dot_size))],
                 [f'{int(minimum_citation)} citations',
                     f'{int(median_citation)} citations',
-                 f'{int(maximum_citation)} citations'
+                    f'{int(top_20_citation)} citations',
+                    f'{int(maximum_citation)} citations'
                  ],
                 loc='upper right',
                 fontsize=10,
@@ -217,9 +266,25 @@ class MultiPaper:
         y_list_avg = []
         color_list = []
 
+        if label_proportion == 'random':
+            # We randomly select a proportion of the labels
+            unique_labels = random.sample(unique_labels,
+                                          int(len(unique_labels) * 0.05))
+        elif label_proportion == 'top':
+            # We get the citation threshold
+            citation_threshold = np.percentile(input_citation_count, 95)
+
         for local_label in unique_labels:
             # We first get the index of x to average
             list_index = np.where(np.array(all_legends) == local_label)[0]
+
+            # We only print the label if the citation count is above the
+            # threshold
+            if label_proportion == 'top':
+                local_citation = np.array(input_citation_count)[list_index]
+                if local_citation[0] < citation_threshold:
+                    continue
+
             # We then get the average of x and y coordinates
             x_avg = np.median(np.array(x)[list_index])
             y_avg = np.median(np.array(y)[list_index])
@@ -228,7 +293,7 @@ class MultiPaper:
                 x_avg,
                 y_avg,
                 local_label,
-                fontsize=5,
+                fontsize=4,
                 color=color_dict[local_label])
 
             all_texts.append(local_text)
@@ -249,8 +314,11 @@ class MultiPaper:
         # We adjust the texts to avoid overlapping
         plt.subplots_adjust(bottom=0.1)
         plt.subplots_adjust(right=0.8)
+        if plot_title is None:
+            plt.title("t-SNE of the LLM embeddings of the papers")
+        else:
+            plt.title(plot_title)
 
-        plt.title("t-SNE of the LLM embeddings of the papers")
         plt.tight_layout()
 
         # Path to save the plot

@@ -163,6 +163,12 @@ Type: int
 
 Default: 8
 
+* --**max_results**: Maximum number of results to fetch from pubmed
+
+Type: int
+
+Default: 100
+
 * --**add_citation_count**: Whether to change the size of the points 
 based on the citation count. This will make the plot more useful but 
 will take more time to run.

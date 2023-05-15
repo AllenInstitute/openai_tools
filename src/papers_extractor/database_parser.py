@@ -42,14 +42,14 @@ class LocalDatabase:
         Returns:
             None
         """
-        logging.info("Opening database")
+        logging.debug("Opening database")
         if database_path is None:
             self.database = Cache(default_ttl=None)
         else:
             self.database = Cache(database_path, default_ttl=None)
 
     def __del__(self):
-        logging.info("Closing database")
+        logging.debug("Closing database")
         self.database.close()
 
     def save_class_to_database(self, key, class_to_save):
@@ -60,7 +60,7 @@ class LocalDatabase:
         Returns:
             None
         """
-        logging.info("Saving class to database")
+        logging.debug("Saving class to database")
         self.database[key] = class_to_save.__dict__
 
     def load_class_from_database(self, key, class_to_load):
@@ -72,13 +72,13 @@ class LocalDatabase:
             class_to_load (object): The class loaded from the database.
         """
         if self.check_in_database(key) is False:
-            logging.info("Key {} not in database".format(key))
+            logging.debug("Key {} not in database".format(key))
         else:
-            logging.info("Loading class from database")
+            logging.debug("Loading class from database")
             for dict_key in self.database[key]:
                 # We do not save the database pointer
                 if key != "database":
-                    logging.info("Loading {} from database".format(dict_key))
+                    logging.debug("Loading {} from database".format(dict_key))
                     class_to_load.__dict__[
                         dict_key] = self.database[key][dict_key]
 
@@ -89,7 +89,7 @@ class LocalDatabase:
         Returns:
             bool: True if the key is in the database, False otherwise.
         """
-        logging.info("Checking if {} is in database".format(key))
+        logging.debug("Checking if {} is in database".format(key))
         return key in self.database
 
     def save_to_database(self, key, value):
@@ -113,7 +113,7 @@ class LocalDatabase:
 
     def reset_key(self, key):
         """Resets data associated with a key."""
-        logging.info("Resetting key")
+        logging.debug("Resetting key")
         if key in self.database:
             del self.database[key]
 
