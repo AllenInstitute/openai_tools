@@ -155,6 +155,14 @@ Type: str
 
 Default: None
 
+* --**perplexity**: Perplexity for the t-SNE plot, default is 8. 
+Higher values will make the plot more spread out. 
+Lower values will make the plot more clustered.
+
+Type: int
+
+Default: 8
+
 Examples
 ========================
 
