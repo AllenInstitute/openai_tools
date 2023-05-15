@@ -163,7 +163,8 @@ class OpenaiLongParser:
                 continue
             NbTokensInPrompt = count_tokens([prompt])
             logging.debug("Calling OpenAI API on a chunk of text.")
-            logging.debug(f"Number of tokens in the prompt: {NbTokensInPrompt}")
+            logging.debug(
+                f"Number of tokens in the prompt: {NbTokensInPrompt}")
             for retry in range(max_retries + 1):
                 start_time = time.perf_counter()  # Record the start time
                 try:

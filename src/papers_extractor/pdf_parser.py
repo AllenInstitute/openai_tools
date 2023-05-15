@@ -50,7 +50,7 @@ class PdfParser:
             else:
                 self.database_id = database_id
             logging.debug("Database key for pdf file: {}"
-                         .format(self.database_id))
+                          .format(self.database_id))
 
             # We load the database if it exists
             self.database.load_class_from_database(self.database_id, self)

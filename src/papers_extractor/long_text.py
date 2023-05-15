@@ -45,7 +45,7 @@ class LongText:
             else:
                 self.database_id = database_id
             logging.debug("Database key for long text: {}"
-                         .format(self.database_id))
+                          .format(self.database_id))
 
             self.database.load_class_from_database(self.database_id, self)
 

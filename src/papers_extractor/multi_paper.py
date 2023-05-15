@@ -56,8 +56,9 @@ class MultiPaper:
                 # We save the database after each paper embedding is calculated
                 indiv_paper.save_database()
                 self.papers_embedding.append(paper_embedding)
-                logging.debug(f"Embedding for paper {indiv_paper.identifier} calculated")
-                logging.info((f"Papers embedding processed: " + 
+                logging.debug(
+                    f"Embedding for paper {indiv_paper.identifier} calculated")
+                logging.info(("Papers embedding processed: " +
                               f"{index} / {len(self.papers_list)}"))
         return self.papers_embedding
 
@@ -93,18 +94,18 @@ class MultiPaper:
 
         # We check the arguments
         if label_proportion not in ['all', 'random', 'top']:
-            raise Exception(("label_proportion must be 'all', 'random' " + \
+            raise Exception(("label_proportion must be 'all', 'random' " +
                              "or 'top'"))
         if label_proportion == 'top' and not add_citation_count:
-            raise Exception(("label_proportion 'top' requires " + 
+            raise Exception(("label_proportion 'top' requires " +
                              "add_citation_count to be True"))
         if label not in ['xshort', 'short', 'medium', 'long', 'xlong']:
-            raise Exception(("label must be 'xshort', 'short', 'medium', " + \
+            raise Exception(("label must be 'xshort', 'short', 'medium', " +
                              "'long' or 'xlong'"))
         if field not in ['abstract', 'title', 'longsummary', 'fulltext']:
-            raise Exception(("field must be 'abstract', 'title', " + \
+            raise Exception(("field must be 'abstract', 'title', " +
                              "'longsummary' or 'fulltext'"))
-            
+
         list_embeddings = self.get_embedding_all_papers(field=field)
 
         # We construct the list of all embeddings and legends
@@ -136,12 +137,12 @@ class MultiPaper:
                     local_citation_count for _ in range(
                         len(local_embeddings))]
                 all_citation_count.extend(local_citations)
-                logging.debug(f"Got citation count for paper " + \
-                             "{self.papers_list[index].identifier}")
+                logging.debug("Got citation count for paper " +
+                              "{self.papers_list[index].identifier}")
                 # We save the database toi avoid losing the citation count
                 self.papers_list[index].save_database()
-                logging.info(f"Papers citation processed: {index} / " + \
-                                f"{len(self.papers_list)}")
+                logging.info(f"Papers citation processed: {index} / " +
+                             f"{len(self.papers_list)}")
 
         logging.warning(f"Number of included papers: {index}")
         tsne_input_matrix = np.array(all_embeddings)
@@ -226,7 +227,7 @@ class MultiPaper:
                     label='Size based on citation count',
                     markerfacecolor='white',
                     markersize=np.sqrt(median_dot_size)),
-                Line2D(
+                 Line2D(
                     [0],
                     [0],
                     marker='o',
@@ -273,7 +274,7 @@ class MultiPaper:
         elif label_proportion == 'top':
             # We get the citation threshold
             citation_threshold = np.percentile(input_citation_count, 80)
-            
+
         for local_label in unique_labels:
             # We first get the index of x to average
             list_index = np.where(np.array(all_legends) == local_label)[0]
@@ -281,8 +282,8 @@ class MultiPaper:
 
             # We only print the label if the citation count is above the
             # threshold
-            if (label_proportion == 'top' 
-                and local_citation< citation_threshold):
+            if (label_proportion == 'top'
+                    and local_citation < citation_threshold):
                 continue
 
             # We then get the average of x and y coordinates
@@ -316,7 +317,7 @@ class MultiPaper:
         plt.subplots_adjust(right=0.8)
         if plot_title is None:
             plt.title("t-SNE of the LLM embeddings of the papers")
-        else: 
+        else:
             plt.title(plot_title)
 
         plt.tight_layout()
