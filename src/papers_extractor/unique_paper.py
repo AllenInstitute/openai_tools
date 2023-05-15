@@ -269,7 +269,7 @@ publication identifier.".format(identifier))
             None
         """
         if self.journal is None:
-            if not check_string_length(journal, 2, 100):
+            if not check_string_length(journal, 2, 200):
                 raise ValueError("The journal is not the right length.")
             self.journal = journal
         else:

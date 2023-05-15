@@ -44,6 +44,15 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
+        "--perplexity",
+        help=("Perplexity for the t-SNE plot, default is 8. Higher values "+
+              "will make the plot more spread out, lower values will "+
+                "make the plot more clustered."),
+        type=int,
+        default=8,
+    )
+
+    parser.add_argument(
         "--add_citation_count",
         help="Whether to add the citation count to the plot",
         type=bool,
@@ -99,4 +108,5 @@ if __name__ == "__main__":
     # We plot the t-SNE plot
     multi_paper.plot_paper_embedding_map(save_path=save_path,
                                          field=args.field,
+                                         perplexity=args.perplexity,
                                          label='xshort')
