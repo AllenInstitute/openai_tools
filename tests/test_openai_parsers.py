@@ -30,7 +30,6 @@ def test_break_up_veryshortsentence_to_chunks():
 
     openai_long_parser = OpenaiLongParser(test_str, chunk_size=4)
     response = ['Hello World']
-    print(openai_long_parser.chunks)
     assert openai_long_parser.chunks == response
 
 
@@ -49,7 +48,6 @@ def test_break_up_shortsentences_to_chunks():
     openai_long_parser = OpenaiLongParser(test_str, chunk_size=4)
     response = ['Hello World.',
                 'Goodbye World.']
-    print(openai_long_parser.chunks)
     assert openai_long_parser.chunks == response
 
 
@@ -60,7 +58,6 @@ def test_break_up_longsentences_to_chunks():
     openai_long_parser = OpenaiLongParser(test_str, chunk_size=10)
     response = ['Test prompt for the first sentence.',
                 'Hello world in the second sentence.']
-    print(openai_long_parser.chunks)
 
     assert openai_long_parser.chunks == response
 
@@ -74,7 +71,6 @@ def test_break_up_threesentences_to_chunks():
     response = ['Test prompt for the first sentence.',
                 'Hello world in the second sentence.',
                 'Goodbye world in the third sentence.']
-    print(openai_long_parser.chunks)
 
     assert openai_long_parser.chunks == response
 
@@ -89,7 +85,6 @@ def test_break_up_groupsentences_to_chunks():
         'Test prompt for the first sentence. ' +
         'Hello world in the second sentence.',
         'Goodbye world in the third sentence.']
-    print(openai_long_parser.chunks)
 
     assert openai_long_parser.chunks == response
 
@@ -103,7 +98,6 @@ def test_break_up_unfinishedsentences_to_chunks():
     response = ['Test prompt for the first sentence.',
                 'Hello world in the second sentence.',
                 'Goodbye world in the third sentence']
-    print(openai_long_parser.chunks)
 
     assert openai_long_parser.chunks == response
 
@@ -118,7 +112,6 @@ def test_break_up_unfinishedgroupsentences_to_chunks():
         'Test prompt for the first sentence. ' +
         'Hello world in the second sentence.',
         'Goodbye world in the third sentence']
-    print(openai_long_parser.chunks)
     assert openai_long_parser.chunks == response
 
 

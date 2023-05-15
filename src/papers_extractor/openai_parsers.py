@@ -162,8 +162,8 @@ class OpenaiLongParser:
             except asyncio.TimeoutError:
                 continue
             NbTokensInPrompt = count_tokens([prompt])
-            logging.info("Calling OpenAI API on a chunk of text.")
-            logging.info(f"Number of tokens in the prompt: {NbTokensInPrompt}")
+            logging.debug("Calling OpenAI API on a chunk of text.")
+            logging.debug(f"Number of tokens in the prompt: {NbTokensInPrompt}")
             for retry in range(max_retries + 1):
                 start_time = time.perf_counter()  # Record the start time
                 try:
@@ -180,7 +180,7 @@ class OpenaiLongParser:
                         ),
                         timeout=timeout + retry * timeout / 2,
                     )
-                    logging.info(
+                    logging.debug(
                         f"API call succeeded with {NbTokensInPrompt} \
                             input tokens.")
                     break
@@ -212,11 +212,11 @@ class OpenaiLongParser:
                 ))
                 abort_event.set()
                 queue.task_done()
-            logging.info(
+            logging.debug(
                 f"Number of tokens in the response: {NbTokensInResponse}")
             # Total number of tokens
             TotalNbTokens = NbTokensInPrompt + NbTokensInResponse
-            logging.info(f"Total number of tokens: {TotalNbTokens}")
+            logging.debug(f"Total number of tokens: {TotalNbTokens}")
 
             # We error out if the response was stopped before the end.
             if response.choices[0].finish_reason == "length":
@@ -233,7 +233,7 @@ class OpenaiLongParser:
             result.append(response.choices[0]['message']['content'])
             queue.task_done()
             finished_tasks.release()
-            logging.info(
+            logging.debug(
                 f"Task done for attempt number {retry+1} \
                     in {elapsed_time:0.2f} seconds.")
 
@@ -321,12 +321,12 @@ class OpenaiLongParser:
             array: The embedding.
         """
 
-        logging.info("Calling the OpenAI API")
+        logging.debug("Calling the OpenAI API")
         # Nb of tokens in the prompt
 
         NbTokensInPrompt = count_tokens([prompt])
 
-        logging.info(f"Number of tokens in the text: {NbTokensInPrompt}")
+        logging.debug(f"Number of tokens in the text: {NbTokensInPrompt}")
 
         # Below we call openai endpoint for embeddings
         prompt = prompt.replace("\n", " ")
@@ -357,12 +357,12 @@ class OpenaiLongParser:
 
         list_chunk = self.chunks
         processed_chunks = []
-        logging.info(f"Number of chunks to process: {len(list_chunk)}")
+        logging.debug(f"Number of chunks to process: {len(list_chunk)}")
 
         # We replace this with async calls
         submit_prompts = []
         for i, chunk in enumerate(list_chunk):
-            logging.info(f"Processing chunk {i}/ {len(list_chunk)}")
+            logging.debug(f"Processing chunk {i}/ {len(list_chunk)}")
 
             # ChatGPT has a un-tenable desire to finish sentences so we add a .
             # at the end of the prompt
@@ -402,11 +402,11 @@ class OpenaiLongParser:
 
         list_chunk = self.chunks
         processed_chunks = []
-        logging.info(f"Number of chunks to embed: {len(list_chunk)}")
+        logging.debug(f"Number of chunks to embed: {len(list_chunk)}")
 
         # We replace this with async calls
         for i, chunk in enumerate(list_chunk):
-            logging.info(f"Processing chunk {i}/ {len(list_chunk)}")
+            logging.debug(f"Processing chunk {i}/ {len(list_chunk)}")
 
             # ChatGPT has a un-tenable desire to finish sentences so we
             # add a "." at the end of the prompt

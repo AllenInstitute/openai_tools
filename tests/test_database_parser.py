@@ -62,7 +62,6 @@ def test_list_keys():
     key = "test_ob4"
     local_database = LocalDatabase()
     local_database.save_class_to_database(key, long_paper_obj)
-    logging.info(local_database.get_list_keys())
     assert key in local_database.get_list_keys()
 
 

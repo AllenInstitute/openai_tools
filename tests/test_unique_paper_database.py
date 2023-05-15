@@ -31,7 +31,7 @@ def test_content_database(local_database):
     long_paper_obj = LongText(longtext, local_database=local_database)
     long_paper_obj.save_database()
     key_list = local_database.get_list_keys()
-    logging.info("Keys in the database: {}".format(key_list))
+    logging.debug("Keys in the database: {}".format(key_list))
     assert long_paper_obj.database_id in key_list
 
 

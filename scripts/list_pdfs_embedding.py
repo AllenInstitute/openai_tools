@@ -69,8 +69,8 @@ if __name__ == "__main__":
     all_long_papers = []
 
     for index, pdf_path in enumerate(pdf_files):
-        logging.info("Processing file: {}".format(pdf_path))
-        logging.info("File number: {}".format(index))
+        logging.debug("Processing file: {}".format(pdf_path))
+        logging.debug("File number: {}".format(index))
 
         # We load the pdf parser to extract and clean the content
         pdf_parser = PdfParser(
@@ -98,7 +98,7 @@ if __name__ == "__main__":
 
     # This is the path where the embeddings will be saved
     save_path = os.path.join(args.path_folder, "tsne_embeddings.png")
-    logging.info("Saving the t-SNE plot to: {}".format(save_path))
+    logging.debug("Saving the t-SNE plot to: {}".format(save_path))
 
     # We plot the t-SNE plot
     multi_paper.plot_paper_embedding_map(save_path=save_path)
