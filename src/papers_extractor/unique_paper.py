@@ -597,7 +597,7 @@ paper.")
             return self.nb_citations
         else:
             metadata = self.get_metadata_from_crossref()
-            if (metadata is not None and "message" in metadata \
+            if (metadata is not None and "message" in metadata
                     and "is-referenced-by-count" in metadata["message"]):
                 nb_citations = metadata['message']['is-referenced-by-count']
             else:

@@ -64,7 +64,7 @@ class MultiPaper:
             field='abstract',
             label='xshort',
             add_citation_count=False
-            ):
+    ):
         """This is used to plot the embedding map of all papers
         Args:
             save_path (str): The path to save the plot
@@ -95,12 +95,16 @@ class MultiPaper:
             all_legends.extend(local_legends)
             all_embeddings.extend(local_embeddings)
             if add_citation_count:
-                local_citation_count = self.papers_list[index].get_nb_citations()
+                local_citation_count = (self.papers_list[index]
+                                        .get_nb_citations()
+                                        )
                 if local_citation_count is None:
                     # We set it to 0 if it is None, there is no great way to
                     # handle this.
                     local_citation_count = 0
-                local_citations = [local_citation_count for _ in range(len(local_embeddings))]
+                local_citations = [
+                    local_citation_count for _ in range(
+                        len(local_embeddings))]
                 all_citation_count.extend(local_citations)
 
         tsne_input_matrix = np.array(all_embeddings)
@@ -144,7 +148,7 @@ class MultiPaper:
             input_citation_count = all_citation_count
             # We log the citation count for each paper
             all_citation_count = np.log(all_citation_count + 1)
-            all_citation_count = (all_citation_count \
+            all_citation_count = (all_citation_count
                                   - np.min(all_citation_count)) / \
                 (np.max(all_citation_count) - np.min(all_citation_count))
             all_citation_count = all_citation_count * 25 + 1
@@ -159,17 +163,11 @@ class MultiPaper:
             maximum_dot_size = np.max(all_citation_count)
 
         if len(all_citation_count) == 0:
-            plt.scatter(x,
-                    y,
-                    c=[color_dict[local_label] for local_label in all_legends],
-                    s=5
-                    )
+            plt.scatter(x, y, c=[color_dict[local_label]
+                        for local_label in all_legends], s=5)
         else:
-            plt.scatter(x,
-                    y,
-                    c=[color_dict[local_label] for local_label in all_legends],
-                    s=all_citation_count
-                    )
+            plt.scatter(x, y, c=[color_dict[local_label]
+                        for local_label in all_legends], s=all_citation_count)
             # We add a legend to the plot to explain the size based on citation
             # count
             local_legend = plt.legend(
@@ -181,7 +179,7 @@ class MultiPaper:
                     label='Size based on citation count',
                     markerfacecolor='white',
                     markersize=np.sqrt(minimum_dot_size)),
-                Line2D(
+                 Line2D(
                     [0],
                     [0],
                     marker='o',
@@ -189,7 +187,7 @@ class MultiPaper:
                     label='Size based on citation count',
                     markerfacecolor='white',
                     markersize=np.sqrt(median_dot_size)),
-                Line2D(
+                 Line2D(
                     [0],
                     [0],
                     marker='o',
@@ -199,8 +197,8 @@ class MultiPaper:
                     markersize=np.sqrt(maximum_dot_size))],
                 [f'{int(minimum_citation)} citations',
                     f'{int(median_citation)} citations',
-                  f'{int(maximum_citation)} citations'
-                  ],
+                 f'{int(maximum_citation)} citations'
+                 ],
                 loc='upper right',
                 fontsize=10,
             )

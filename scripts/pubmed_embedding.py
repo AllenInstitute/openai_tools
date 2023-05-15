@@ -45,9 +45,9 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--perplexity",
-        help=("Perplexity for the t-SNE plot, default is 8. Higher values "+
-              "will make the plot more spread out, lower values will "+
-                "make the plot more clustered."),
+        help=("Perplexity for the t-SNE plot, default is 8. Higher values " +
+              "will make the plot more spread out, lower values will " +
+              "make the plot more clustered."),
         type=int,
         default=8,
     )
@@ -112,6 +112,6 @@ if __name__ == "__main__":
                                          field=args.field,
                                          perplexity=args.perplexity,
                                          add_citation_count=(
-                                            args.add_citation_count
+                                             args.add_citation_count
                                          ),
                                          label='xshort')
