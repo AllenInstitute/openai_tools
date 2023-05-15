@@ -173,9 +173,18 @@ Default: 100
 based on the citation count. This will make the plot more useful but 
 will take more time to run.
 
-Type: int
+Type: bool
 
-Default: 8
+Default: True
+
+* --**label_proportion**: The proportion of labels to plot. Can be 'all', 
+'random' or 'top'. If 'top' only the top 5% cited papers will be plotted. 
+Add_citation_count must be True for this to work.  If 'random' only 5% of 
+the papers will be plotted..
+
+Type: str
+
+Default: top
 
 Examples
 ========================
@@ -199,6 +208,11 @@ Here is an example embedding for the following command:
 ```python pubmed_embedding.py --pubmed_query "In vivo two photon voltage imaging" --field abstract --save_path ./twophotonvoltage.png```
 
 ![Example embedding](example/twophotonvoltage.png)
+
+Here is an second embedding for the following command for a very large number of paper:
+```python pubmed_embedding.py --pubmed_query "Mouse visual cortex" --field abstract --save_path ../example/mouse_invivo_recordings.png --add_citation_count True --max_result 3500 --perplexity 30```
+
+![Example embedding](example/mouse_invivo_recordings.png)
 
 Database
 ========================

@@ -58,7 +58,7 @@ if __name__ == "__main__":
             count. This will make the plot more useful but will take more \
             time to run.",
         type=bool,
-        default=False,
+        default=True,
     )
 
     parser.add_argument(
