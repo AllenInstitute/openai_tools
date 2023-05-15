@@ -11,7 +11,7 @@ list_doi = [
     '10.1038/nature12373',
     '10.1523/ENEURO.0207-17.2017',
     '10.1016/j.neuron.2022.09.033'
-]
+    ]
 
 list_titles = [
     'AI-aided design of novel targeted covalent inhibitors against SARS-CoV-2',
