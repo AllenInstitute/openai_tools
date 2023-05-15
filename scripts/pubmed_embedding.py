@@ -84,9 +84,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "--label_proportion",
         help="The proportion of labels to plot. Can be 'all', 'random' or \
-            'top'. If 'top' only the top 20% cited papers will be plotted. \
+            'top'. If 'top' only the top 10% cited papers will be plotted. \
             Add_citation_count must be True for this to work. \
-            If 'random' only 20% of the papers will be plotted.",
+            If 'random' only 10% of the papers will be plotted.",
         type=str,
         default="top"
     )

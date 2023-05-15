@@ -85,9 +85,9 @@ class MultiPaper:
             information.
             plot_title (str): The title of the plot.
             label_proportion (str): The proportion of labels to plot. Can be
-            'all', 'random' or 'top'. If 'top' only the top 20% cited papers
+            'all', 'random' or 'top'. If 'top' only the top 10% cited papers
             will be plotted. Add_citation_count must be True for this to work.
-            If 'random' only 20% of the papers will be plotted.
+            If 'random' only 10% of the papers will be plotted.
         Returns:
             None
         """
@@ -189,7 +189,7 @@ class MultiPaper:
             all_citation_count = (all_citation_count
                                   - np.min(all_citation_count)) / \
                 (np.max(all_citation_count) - np.min(all_citation_count))
-            all_citation_count = all_citation_count * 25 + 1
+            all_citation_count = all_citation_count * 20 + 1
 
             # We convert to int
             all_citation_count = all_citation_count.astype(np.int32)
@@ -269,10 +269,10 @@ class MultiPaper:
         if label_proportion == 'random':
             # We randomly select a proportion of the labels
             unique_labels = random.sample(unique_labels,
-                                          int(len(unique_labels) * 0.2))
+                                          int(len(unique_labels) * 0.1))
         elif label_proportion == 'top':
             # We get the citation threshold
-            citation_threshold = np.percentile(input_citation_count, 80)
+            citation_threshold = np.percentile(input_citation_count, 90)
 
         for local_label in unique_labels:
             # We first get the index of x to average
