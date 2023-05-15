@@ -111,7 +111,10 @@ class PubmedPapersParser:
                 logging.info("Created paper object for {}".format(identity))
             except ValueError:
                 logging.warning(
-                    "Could not paper object for {}".format(identity))
+                    "Could not create paper object for {}".format(identity))
+            except TypeError:
+                logging.warning(
+                    "Could not create paper object for {}".format(identity))
         return unique_papers
 
     def _parse_article(self, article):
