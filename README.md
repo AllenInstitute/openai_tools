@@ -190,14 +190,14 @@ around in vivo calcium imaging of neuronal activity.
 Here is an example embedding for the following command:
 ```python pubmed_embedding.py --pubmed_query "In vivo two photon voltage imaging" --field abstract --save_path ../example/twophotonvoltage.html --perplexity 5```
 
-Below is a screenshot. [The generated plot is interactive](example/twophotonvoltage.html) 
+Below is a screenshot. [The generated plot is interactive]([example/twophotonvoltage.html](https://alleninstitute.github.io/openai_tools/example/twophotonvoltage.html)) 
 to explore the content of each paper. Download the html on your machine and open in a browser.
 ![Example embedding](example/twophotonvoltage.png)
 
 Here is an second embedding for the following command for a very large number of paper:
 ```python pubmed_embedding.py --pubmed_query "Mouse visual cortex" --field abstract --save_path ../example/mouse_invivo_recordings.html --max_result 3500 --perplexity 30```
 
-Below is a screenshot. [The generated plot is interactive](example/mouse_invivo_recordings.html) 
+Below is a screenshot. [The generated plot is interactive](https://alleninstitute.github.io/openai_tools/example/mouse_invivo_recordings.html) 
 to explore the content of each paper. Download the html on your machine and open in a browser.
 ![Example embedding](example/mouse_invivo_recordings.png)
 
