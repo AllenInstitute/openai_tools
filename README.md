@@ -169,15 +169,6 @@ Type: int
 
 Default: 100
 
-* --**label_proportion**: The proportion of labels to plot. Can be 'all', 
-'random' or 'top'. If 'top' only the top 5% cited papers will be plotted. 
-Add_citation_count must be True for this to work.  If 'random' only 5% of 
-the papers will be plotted..
-
-Type: str
-
-Default: top
-
 Examples
 ========================
 
