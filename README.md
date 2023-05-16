@@ -126,7 +126,7 @@ Parameters for pubmed_embedding
 ========================
 
 * --**pubmed_query**: A query made to pubmed. This can return a very large number of 
-publications and they will be processed in chunks. 
+publications and they will be processed up to **max_results**. 
 
 Type: str
 
