@@ -169,14 +169,6 @@ Type: int
 
 Default: 100
 
-* --**add_citation_count**: Whether to change the size of the points 
-based on the citation count. This will make the plot more useful but 
-will take more time to run.
-
-Type: bool
-
-Default: True
-
 * --**label_proportion**: The proportion of labels to plot. Can be 'all', 
 'random' or 'top'. If 'top' only the top 5% cited papers will be plotted. 
 Add_citation_count must be True for this to work.  If 'random' only 5% of 
@@ -205,13 +197,17 @@ around in vivo calcium imaging of neuronal activity.
 * **pubmed_embedding**
 
 Here is an example embedding for the following command:
-```python pubmed_embedding.py --pubmed_query "In vivo two photon voltage imaging" --field abstract --save_path ./twophotonvoltage.png```
+```python pubmed_embedding.py --pubmed_query "In vivo two photon voltage imaging" --field abstract --save_path ../example/twophotonvoltage.html --perplexity 5```
 
+Below is a screenshot. [The generated plot is interactive](example/twophotonvoltage.html) 
+to explore the content of each paper. 
 ![Example embedding](example/twophotonvoltage.png)
 
 Here is an second embedding for the following command for a very large number of paper:
-```python pubmed_embedding.py --pubmed_query "Mouse visual cortex" --field abstract --save_path ../example/mouse_invivo_recordings.png --add_citation_count True --max_result 3500 --perplexity 30```
+```python pubmed_embedding.py --pubmed_query "Mouse visual cortex" --field abstract --save_path ../example/mouse_invivo_recordings.html --max_result 3500 --perplexity 30```
 
+Below is a screenshot. [The generated plot is interactive](example/mouse_invivo_recordings.html) 
+to explore the content of each paper. 
 ![Example embedding](example/mouse_invivo_recordings.png)
 
 Database
