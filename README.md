@@ -190,7 +190,7 @@ around in vivo calcium imaging of neuronal activity.
 Here is an example embedding for the following command:
 ```python pubmed_embedding.py --pubmed_query "In vivo two photon voltage imaging" --field abstract --save_path ../example/twophotonvoltage.html --perplexity 5```
 
-Below is a screenshot. [The generated plot is interactive]([example/twophotonvoltage.html](https://alleninstitute.github.io/openai_tools/example/twophotonvoltage.html)) 
+Below is a screenshot. [The generated plot is interactive]([example/twophotonvoltage.html](https://alleninstitute.github.io/openai_tools/example/twophotonvoltage.html) 
 to explore the content of each paper. Download the html on your machine and open in a browser.
 ![Example embedding](example/twophotonvoltage.png)
 
