@@ -284,21 +284,30 @@ class MultiPaper:
             if len(abstract)>30:
                 real_index_paper = real_index_paper + 1
 
-                prompt_citing = "HERE IS AN ABSTRACT FROM A PAPER : \n\n" + abstract \
-                    + "\n\n CAN YOU MODIFY THE FOLLOWING LONG SCIENTIFIC TEXT " + \
-                    "USING THE KNOWLEDGE PROVIDED BY THE PREVIOUS ABSTRACT. ADD " + \
-                    f"THE FOLLOWING STRING '[{real_index_paper}]' WHEN CITING THE ABSTRACT. KEEP ALL PREVIOUS CITATIONS, ADD SENTENCES IF NEEDED: \n\n {final_text}"
+                # We generate a string with all previous citations index like [0], [1], [2]
+                all_indexes = [f"[{i}]" for i in range(real_index_paper)]
 
+                prompt_citing = "You are writing a scientific review. Here is an abstract from a paper : \n\n'" + abstract + "'\n\n" \
+                    + "Modify the sentences of the scientific review " + \
+                    " to add the insights from the abstract. " + \
+                    f"Use the following string '[{real_index_paper}]' when citing the abstract." + \
+                    f"Keep all previous citations '[i]' intact." + \
+                    f"Here is your ongoing scientific review  : \n\n'"
+                
+                end_prompt = "I repeat your instructions: Modify the sentences of the scientific review " + \
+                    " to add the insights from the abstract. " + \
+                    f"Use the following string '[{real_index_paper}]' when citing the abstract." + \
+                    f"Keep all previous citations (e.g. [1] [2], ...) intact." 
+                               
                 openai_obj = OpenaiLongParser(
                     final_text,
                     chunk_size=2000,
                     max_concurrent_calls=10)
                     
-                final_text = openai_obj.process_chunks_through_prompt(prompt_citing)
+                final_text = openai_obj.process_chunks_through_prompt(prompt_citing, temperature=0, end_prompt=end_prompt)
                 final_text = "\n".join(final_text)
                 local_citation_list = paper.get_label_string('medium')
                 all_citations.append(f"[{real_index_paper}] {local_citation_list}")
-
         # We add citation list 
         final_text = final_text + "\n\n" + "\n".join(all_citations)
         
