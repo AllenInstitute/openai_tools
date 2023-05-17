@@ -9,6 +9,7 @@ from bokeh.plotting import figure, show, output_file
 from bokeh.models import HoverTool, ColumnDataSource
 from bokeh.models import Scatter
 from bokeh.plotting import save
+from papers_extractor.openai_parsers import OpenaiLongParser
 
 # These are helper functions to compare papers and plot them
 
@@ -226,3 +227,95 @@ class MultiPaper:
             show(p)
         else:
             show(p)
+
+    def _process_prompt_through(self, prompt, field):
+        """ Process a prompt throught the concatenated abstracts and titles
+        of the papers in the list."""
+        papers_list = self.papers_list
+
+        if field == 'abstract':
+            list_texts = [paper.get_abstract() for paper in papers_list]
+        elif field == 'title':
+            list_texts = [paper.get_title() for paper in papers_list]
+        elif field == 'both':
+            list_texts = [paper.get_abstract() + "\n" + paper.get_title()
+                          for paper in papers_list]
+
+        input_text = "\n".join(list_texts)
+
+        openai_obj = OpenaiLongParser(
+                input_text,
+                chunk_size=2000,
+                max_concurrent_calls=10)
+        
+        prompt = prompt + "\n\n" + input_text + "\n\n" 
+        
+        final_text = openai_obj.process_chunks_through_prompt(prompt)
+            
+        return final_text
+    
+    def get_summary_cluster_all_papers(self, field='title'):
+        prompt = "Can you summarize in 3-4 words maximum the topic that are " + \
+            "shared across the majority of all following papers:"
+        result_text = self._process_prompt_through(prompt, field)
+
+        return result_text
+    
+    def get_cited_summary_across_all_papers(self):
+        single_sentence = self.get_summary_sentence_all_papers(field='title')
+
+        prompt = "Can you write a long accurate scientific abstract " + \
+            "without references on the following topic:"
+
+        openai_obj = OpenaiLongParser(
+                single_sentence[0],
+                chunk_size=2000,
+                max_concurrent_calls=10)
+                
+        final_text = openai_obj.process_chunks_through_prompt(prompt)
+        final_text = "\n".join(final_text)
+        
+        list_papers = self.papers_list
+        all_citations = []
+        real_index_paper = 0
+        for index_paper, paper in enumerate(list_papers):
+            abstract = paper.get_abstract()
+            index_paper = index_paper + 1
+            if len(abstract)>30:
+                real_index_paper = real_index_paper + 1
+
+                prompt_citing = "HERE IS AN ABSTRACT FROM A PAPER : \n\n" + abstract \
+                    + "\n\n CAN YOU MODIFY THE FOLLOWING LONG SCIENTIFIC TEXT " + \
+                    "USING THE KNOWLEDGE PROVIDED BY THE PREVIOUS ABSTRACT. ADD " + \
+                    f"THE FOLLOWING STRING '[{real_index_paper}]' WHEN CITING THE ABSTRACT. KEEP ALL PREVIOUS CITATIONS, ADD SENTENCES IF NEEDED: \n\n {final_text}"
+
+                openai_obj = OpenaiLongParser(
+                    final_text,
+                    chunk_size=2000,
+                    max_concurrent_calls=10)
+                    
+                final_text = openai_obj.process_chunks_through_prompt(prompt_citing)
+                final_text = "\n".join(final_text)
+                local_citation_list = paper.get_label_string('medium')
+                all_citations.append(f"[{real_index_paper}] {local_citation_list}")
+
+        # We add citation list 
+        final_text = final_text + "\n\n" + "\n".join(all_citations)
+        
+        return final_text
+
+    def get_summary_sentence_all_papers(self, field='title'):
+        """Get the summary of all papers. This function pull the 
+        title or abstract of all papers and return a summary of them.
+        It creates an OpenAi object and uses call to LLM functions with
+        a prompt to get the summary. When the summary is too long, it 
+        is processed in multiple calls."""
+        if field not in ['abstract', 'title', 'both']:
+            raise Exception(("field must be 'abstract' or 'title'"))
+       
+        prompt = "Can you create a sentence that summarize the content of " + \
+            "the following papers:\n\n"
+        
+        final_text = self._process_prompt_through(prompt, field)
+            
+        return final_text

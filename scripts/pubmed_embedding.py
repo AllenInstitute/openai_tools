@@ -53,15 +53,6 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--add_citation_count",
-        help="Whether to change the size of the points based on the citation \
-            count. This will make the plot more useful but will take more \
-            time to run.",
-        type=bool,
-        default=True,
-    )
-
-    parser.add_argument(
         "--database_path",
         help="Path to the database location. This is an optional but \
             very recommended argument. Remember that many calls will be \
@@ -81,15 +72,6 @@ if __name__ == "__main__":
         default=100,
     )
 
-    parser.add_argument(
-        "--label_proportion",
-        help="The proportion of labels to plot. Can be 'all', 'random' or \
-            'top'. If 'top' only the top 5% cited papers will be plotted. \
-            Add_citation_count must be True for this to work. \
-            If 'random' only 5% of the papers will be plotted.",
-        type=str,
-        default="top"
-    )
     args = parser.parse_args()
 
     QueryObject = PubmedPapersParser(args.pubmed_query)
@@ -122,10 +104,7 @@ if __name__ == "__main__":
         save_path=save_path,
         field=args.field,
         perplexity=args.perplexity,
-        add_citation_count=(
-            args.add_citation_count),
-        label='xshort',
         plot_title=(
             "t-SNE for Pubmed " +
-            f"query: {args.pubmed_query}"),
-        label_proportion=args.label_proportion)
+            f"query: {args.pubmed_query}")
+    )
