@@ -47,6 +47,7 @@ def test_multi_paper_cluster():
     print(summary)
     assert len(summary[0]) > 2
 
+
 def test_cited_summary():
     query = PubmedPapersParser('Jerome Lecoq')
 
