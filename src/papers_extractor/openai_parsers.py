@@ -341,7 +341,8 @@ class OpenaiLongParser:
 
     def process_chunks_through_prompt(
         self,
-        prompt,
+        start_prompt,
+        end_prompt='.',
         save_path=None,
         temperature=0.1,
         presence_penalty=0.0,
@@ -367,7 +368,7 @@ class OpenaiLongParser:
 
             # ChatGPT has a un-tenable desire to finish sentences so we add a .
             # at the end of the prompt
-            submit_prompt = prompt + "\n\n" + chunk + "."
+            submit_prompt = start_prompt + "\n\n" + chunk + end_prompt
 
             if save_path:
                 # We save the input prompt chunk
