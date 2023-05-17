@@ -342,7 +342,7 @@ class OpenaiLongParser:
     def process_chunks_through_prompt(
         self,
         start_prompt,
-        end_prompt = '.', 
+        end_prompt='.',
         save_path=None,
         temperature=0.1,
         presence_penalty=0.0,

@@ -26,6 +26,7 @@ def test_pubmed_query_summary():
     summary = multi_paper.get_summary_sentence_all_papers(field='title')
     assert len(summary[0]) > 2
 
+
 def test_multi_paper_summary():
     first_paper = UniquePaper("10.1101/2020.03.03.972133")
     second_paper = UniquePaper("10.1016/j.celrep.2023.112434")
@@ -34,25 +35,16 @@ def test_multi_paper_summary():
     summary = multi_paper.get_summary_sentence_all_papers(field='title')
     assert len(summary[0]) > 2
 
+
 def test_multi_paper_cluster():
     query = PubmedPapersParser('Mark Schnitzer')
-
-    query.search_pubmed(max_results=3)
-    query.fetch_details()
-    list_papers = query.get_list_unique_papers()
-    multi_paper = MultiPaper(list_papers)
-    summary = multi_paper.get_summary_cluster_all_papers(field='title')
-    assert len(summary[0]) > 2
-
-def test_closed_semantic():
-    query = PubmedPapersParser('tasic bosiljka transcriptomic visual taxonomy')
 
     query.search_pubmed(max_results=2)
     query.fetch_details()
     list_papers = query.get_list_unique_papers()
-
     multi_paper = MultiPaper(list_papers)
-    summary = multi_paper.get_cited_summary_across_all_papers()
+    summary = multi_paper.get_summary_cluster_all_papers(field='title')
+    print(summary)
     assert len(summary[0]) > 2
 
 def test_cited_summary():
@@ -64,7 +56,8 @@ def test_cited_summary():
 
     multi_paper = MultiPaper(list_papers)
     summary = multi_paper.get_cited_summary_across_all_papers()
-    assert len(summary[0]) > 2
+    assert len(summary) > 2
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, stream=sys.stdout, force=True)
@@ -72,4 +65,3 @@ if __name__ == "__main__":
     test_pubmed_query_summary()
     test_multi_paper_cluster()
     test_cited_summary()
-    test_closed_semantic()

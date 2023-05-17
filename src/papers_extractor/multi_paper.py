@@ -244,23 +244,24 @@ class MultiPaper:
         input_text = "\n".join(list_texts)
 
         openai_obj = OpenaiLongParser(
-                input_text,
-                chunk_size=2000,
-                max_concurrent_calls=10)
-        
-        prompt = prompt + "\n\n" + input_text + "\n\n" 
-        
+            input_text,
+            chunk_size=2000,
+            max_concurrent_calls=10)
+
+        prompt = prompt + "\n\n" + input_text + "\n\n"
+
         final_text = openai_obj.process_chunks_through_prompt(prompt)
-            
+
         return final_text
-    
+
     def get_summary_cluster_all_papers(self, field='title'):
-        prompt = "Can you summarize in 3-4 words maximum the topic that are " + \
+        prompt = "Can you summarize in 3-4 words " + \
+            "maximum the topic that are " + \
             "shared across the majority of all following papers:"
         result_text = self._process_prompt_through(prompt, field)
 
         return result_text
-    
+
     def get_cited_summary_across_all_papers(self):
         single_sentence = self.get_summary_sentence_all_papers(field='title')
 
@@ -268,63 +269,67 @@ class MultiPaper:
             "without references on the following topic:"
 
         openai_obj = OpenaiLongParser(
-                single_sentence[0],
-                chunk_size=2000,
-                max_concurrent_calls=10)
-                
+            single_sentence[0],
+            chunk_size=2000,
+            max_concurrent_calls=10)
+
         final_text = openai_obj.process_chunks_through_prompt(prompt)
         final_text = "\n".join(final_text)
-        
+
         list_papers = self.papers_list
         all_citations = []
         real_index_paper = 0
         for index_paper, paper in enumerate(list_papers):
             abstract = paper.get_abstract()
             index_paper = index_paper + 1
-            if len(abstract)>30:
+            if len(abstract) > 30:
                 real_index_paper = real_index_paper + 1
 
-                # We generate a string with all previous citations index like [0], [1], [2]
-                all_indexes = [f"[{i}]" for i in range(real_index_paper)]
-
-                prompt_citing = "You are writing a scientific review. Here is an abstract from a paper : \n\n'" + abstract + "'\n\n" \
+                prompt_citing = "You are writing a scientific review. Here" + \
+                    " is an abstract from a paper : \n\n'" \
+                    + abstract + "'\n\n" \
                     + "Modify the sentences of the scientific review " + \
                     " to add the insights from the abstract. " + \
-                    f"Use the following string '[{real_index_paper}]' when citing the abstract." + \
-                    f"Keep all previous citations '[i]' intact." + \
-                    f"Here is your ongoing scientific review  : \n\n'"
-                
-                end_prompt = "I repeat your instructions: Modify the sentences of the scientific review " + \
+                    f"Use the following string '[{real_index_paper}]' when" + \
+                    " citing the abstract." + \
+                    "Keep all previous citations '[i]' intact." + \
+                    "Here is your ongoing scientific review  : \n\n'"
+
+                end_prompt = "I repeat your instructions: Modify the " + \
+                    " sentences of the scientific review " + \
                     " to add the insights from the abstract. " + \
-                    f"Use the following string '[{real_index_paper}]' when citing the abstract." + \
-                    f"Keep all previous citations (e.g. [1] [2], ...) intact." 
-                               
+                    f"Use the following string '[{real_index_paper}]' " + \
+                    "when citing the abstract." + \
+                    "Keep all previous citations (e.g. [1] [2], ...) intact."
+
                 openai_obj = OpenaiLongParser(
                     final_text,
                     chunk_size=2000,
                     max_concurrent_calls=10)
-                    
-                final_text = openai_obj.process_chunks_through_prompt(prompt_citing, temperature=0, end_prompt=end_prompt)
+
+                final_text = openai_obj.process_chunks_through_prompt(
+                    prompt_citing, temperature=0, end_prompt=end_prompt)
                 final_text = "\n".join(final_text)
                 local_citation_list = paper.get_label_string('medium')
-                all_citations.append(f"[{real_index_paper}] {local_citation_list}")
-        # We add citation list 
+                all_citations.append(
+                    f"[{real_index_paper}] {local_citation_list}")
+        # We add citation list
         final_text = final_text + "\n\n" + "\n".join(all_citations)
-        
+
         return final_text
 
     def get_summary_sentence_all_papers(self, field='title'):
-        """Get the summary of all papers. This function pull the 
+        """Get the summary of all papers. This function pull the
         title or abstract of all papers and return a summary of them.
         It creates an OpenAi object and uses call to LLM functions with
-        a prompt to get the summary. When the summary is too long, it 
+        a prompt to get the summary. When the summary is too long, it
         is processed in multiple calls."""
         if field not in ['abstract', 'title', 'both']:
             raise Exception(("field must be 'abstract' or 'title'"))
-       
+
         prompt = "Can you create a sentence that summarize the content of " + \
             "the following papers:\n\n"
-        
+
         final_text = self._process_prompt_through(prompt, field)
-            
+
         return final_text
