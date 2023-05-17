@@ -18,7 +18,7 @@ setup(
     long_description_content_type="text/markdown",
     long_description=readme,
     author="Jerome Lecoq",
-    version="0.4.0",
+    version="0.5.0",
     author_email="jeromel@alleninstitute.org",
     url="https://github.com/AllenInstitute/openai_tools",
     license=license,
